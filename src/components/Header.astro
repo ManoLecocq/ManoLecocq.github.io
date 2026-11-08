@@ -1,0 +1,45 @@
+---
+// En-tête fixe : CV et Contact restent visibles en permanence, y compris sur mobile.
+interface Props { nom: string; nav: { titre: string; ancre: string }[]; cvHref: string; accueil?: string }
+const { nom, nav, cvHref, accueil = '#top' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const lien = (ancre: string) => (accueil === '#top' ? `#${ancre}` : `${base}#${ancre}`);
+---
+<header class="hdr">
+  <div class="wrap hdr__inner">
+    <a class="hdr__brand" href={accueil}>{nom}</a>
+    <nav class="hdr__nav" aria-label="Sections">
+      <ul>
+        {nav.map((n) => <li><a href={lien(n.ancre)}>{n.titre}</a></li>)}
+      </ul>
+    </nav>
+    <div class="hdr__actions">
+      <a class="btn btn--line" href={lien('contact')}>Contact</a>
+      <a class="btn btn--dark" href={cvHref} download>CV <span aria-hidden="true">↓</span></a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .hdr__inner { display: flex; align-items: center; gap: var(--space-5); min-height: var(--header-h); }
+  .hdr__brand {
+    display: inline-flex; align-items: center; min-height: var(--tap);
+    font-weight: 750; font-size: 1.05rem; letter-spacing: -0.02em; text-decoration: none;
+    white-space: nowrap;
+  }
+  .hdr__nav { display: none; }
+  .hdr__nav ul { list-style: none; padding: 0; display: flex; gap: var(--space-5); }
+  .hdr__nav a { display: inline-flex; align-items: center; min-height: var(--tap); text-decoration: none; font-size: 0.95rem; }
+  .hdr__actions { margin-left: auto; display: flex; gap: var(--space-2); }
+
+  @media (min-width: 900px) {
+    .hdr__nav { display: block; margin-left: var(--space-5); }
+  }
+</style>

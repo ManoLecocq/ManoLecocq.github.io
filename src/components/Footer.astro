@@ -1,0 +1,19 @@
+---
+interface Props { nom: string; cvHref: string; accueil?: string }
+const { nom, cvHref, accueil = '#top' } = Astro.props;
+---
+<footer class="ftr on-dark">
+  <div class="wrap ftr__inner">
+    <span>{nom} · Administrateur système · Réseau & cybersécurité</span>
+    <a href={cvHref} download>Télécharger le CV <span aria-hidden="true">↓</span></a>
+    <a href={accueil}>Haut de page <span aria-hidden="true">↑</span></a>
+  </div>
+</footer>
+
+<style>
+  .ftr { background: var(--dark); color: var(--on-dark-mute); border-top: 1px solid var(--on-dark-line); }
+  .ftr__inner { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); align-items: center; padding-block: var(--space-4); font-size: var(--fs-sm); }
+  .ftr__inner span { margin-right: auto; }
+  .ftr a { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--on-dark); font-weight: 600; text-decoration: none; }
+  .ftr a:hover { color: var(--accent-on-dark); }
+</style>

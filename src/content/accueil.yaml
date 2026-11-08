@@ -1,0 +1,35 @@
+# Haut de page : ce qu'un recruteur doit voir sans scroller.
+nom: Mano Lecocq
+role: Administrateur système en alternance chez Thales
+domaine: Réseau & cybersécurité
+situation: BUT R&T Cybersécurité · diplômé en 2027 · Valence
+# TODO Mano : préciser ce que tu recherches après 2027 (CDI, poste visé, mobilité…). Laisser vide pour ne rien afficher.
+recherche: ""
+accroche: "Pas de liste de mots-clés : chaque compétence ici a sa preuve."
+
+# Les trois chiffres de l'aplat noir. "ancre" renvoie à la réalisation détaillée.
+chiffres:
+  - chiffre: "1 700"
+    unite: lignes
+    texte: Script PowerShell en production, exécuté chaque mois
+    contexte: Thales
+    ancre: script
+  - chiffre: "90"
+    unite: sites
+    texte: VPN IPsec hub-and-spoke, tous au même plan d'adressage
+    contexte: Projet réseau
+    ancre: vpn
+  - chiffre: "5"
+    unite: segments réseau
+    texte: Infrastructure web isolée derrière un cluster de pare-feux redondant
+    contexte: Projet sécurité
+    ancre: web
+
+# Ligne sous les chiffres.
+en_cours:
+  texte: "En ce moment : chef de projet de **DoppelNet**, un agent IA qui duplique une infrastructure pour tester avant la production."
+  ancre: doppelnet
+
+actions:
+  cv: Télécharger mon CV
+  contact: Me contacter

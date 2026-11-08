@@ -1,47 +1,43 @@
 ---
-import Planche from './Planche.astro';
 import Todo from './Todo.astro';
-const { data, planche } = Astro.props;
+const { data } = Astro.props;
 const obtenues = data.items.filter((c) => c.status === 'obtenu');
+const enCours = data.items.filter((c) => c.status === 'en cours');
 ---
-<Planche num={planche.num} titre={planche.titre} id={planche.ancre} sousTitre={data.sous_titre}>
-  <ul class="certifs" role="list">
-    {obtenues.map((c) => (
-      <li class="certif" data-reveal>
-        <span class="certif__stamp mono" aria-hidden="true">✓</span>
-        <div>
-          <p class="certif__nom">{c.nom}</p>
-          {c.organisme && <p class="certif__org mono">{c.organisme}</p>}
-          {c.verif && <a class="certif__verif" href={c.verif} rel="noopener">Vérifier <span aria-hidden="true">↗</span></a>}
+<section class="section" id="certifications" aria-labelledby="certif-titre">
+  <div class="wrap certs">
+    <header class="section__head">
+      <p class="mono section__label">Certifications</p>
+      <h2 id="certif-titre" class="section__title">Validé à l'extérieur.</h2>
+    </header>
+    <ul class="certs__list" role="list">
+      {obtenues.map((c) => (
+        <li>
+          <span class="certs__name">{c.nom}</span>
+          <span class="mono certs__org">{c.organisme}</span>
+          {c.verif && <a class="certs__verif" href={c.verif} rel="noopener">Vérifier <span aria-hidden="true">↗</span></a>}
           <Todo texte={c.todo} />
-        </div>
-      </li>
-    ))}
-  </ul>
-</Planche>
+        </li>
+      ))}
+    </ul>
+    {enCours.length > 0 && (
+      <p class="certs__next"><span class="mono">En préparation</span> {enCours.map((c) => c.nom).join(' · ')}</p>
+    )}
+  </div>
+</section>
 
 <style>
-  .certifs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
-  .certif {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--space-3);
-    align-items: start;
-    padding: var(--space-4);
-    background: var(--paper-raised);
-    border: var(--stroke) solid var(--line-strong);
+  .certs__list { list-style: none; padding: 0; border-bottom: 1px solid var(--line); }
+  .certs__list li { display: grid; gap: 0.2rem var(--space-5); padding: var(--space-4) 0; border-top: 1px solid var(--line); }
+  .certs__name { font-weight: 700; font-size: 1.15rem; letter-spacing: -0.015em; }
+  .certs__org { color: var(--fg-mute); text-transform: none; }
+  .certs__verif { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--accent); font-weight: 600; }
+  .certs__next { margin-top: var(--space-5); color: var(--fg-mute); font-size: var(--fs-sm); max-width: none; }
+  .certs__next .mono { color: var(--fg); margin-right: var(--space-2); }
+  @media (min-width: 960px) {
+    .certs { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr); column-gap: var(--space-8); }
+    .certs__list, .certs__next { grid-column: 2; }
+    .certs__list li { grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; }
+    .certs :global(.section__head) { grid-row: span 2; }
   }
-  .certif__stamp {
-    display: grid; place-items: center;
-    width: 2rem; height: 2rem;
-    border: 1.5px solid var(--ok);
-    color: var(--ok);
-    border-radius: 50%;
-    font-size: 0.9rem;
-  }
-  .certif__nom { margin: 0; font-weight: 600; line-height: 1.35; }
-  .certif__org { margin: var(--space-1) 0 0; }
-  .certif__verif { display: inline-flex; align-items: center; min-height: var(--tap); font-family: var(--f-mono); font-size: 0.78rem; }
-  @media (min-width: 720px) { .certifs { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1000px) { .certifs { grid-template-columns: repeat(3, 1fr); } }
 </style>

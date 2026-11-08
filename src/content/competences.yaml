@@ -11,10 +11,10 @@ competences:
 
 # projet → compétences mobilisées. "titre" est le libellé court affiché dans la matrice.
 lignes:
-  - { projet: sae303, titre: SAÉ 3.03 · Multi-site, ancre: fiche-sae303, competences: [adm, con, sec, sur] }
-  - { projet: sae401, titre: SAÉ 4.01 · PneusForEver, ancre: fiche-sae401, competences: [adm, con, sec, sur] }
-  - { projet: thales, titre: Stage Thales, ancre: fiche-thales, competences: [adm, pro, sur] }
-  - { projet: ptut, titre: PTUT · DoppelNet, ancre: fiche-ptut, competences: [adm, pro] }
-  - { projet: kifaitoo, titre: SAÉ KIFAITOO, ancre: vignette-kifaitoo, competences: [adm, con] }
-  - { projet: quizlink, titre: SAÉ QuizLink, ancre: vignette-quizlink, competences: [pro] }
-  - { projet: scripts, titre: Scripts R4.05, ancre: vignette-scripts, competences: [adm, pro] }
+  - { projet: sae303, titre: SAÉ 3.03 · Multi-site, ancre: vpn, competences: [adm, con, sec, sur] }
+  - { projet: sae401, titre: SAÉ 4.01 · PneusForEver, ancre: web, competences: [adm, con, sec, sur] }
+  - { projet: thales, titre: Stage Thales · Script PowerShell, ancre: script, competences: [adm, pro, sur] }
+  - { projet: ptut, titre: PTUT · DoppelNet, ancre: doppelnet, competences: [adm, pro] }
+  - { projet: kifaitoo, titre: SAÉ KIFAITOO, ancre: realisations, competences: [adm, con] }
+  - { projet: quizlink, titre: SAÉ QuizLink, ancre: realisations, competences: [pro] }
+  - { projet: scripts, titre: Scripts R4.05, ancre: realisations, competences: [adm, pro] }

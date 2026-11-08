@@ -1,19 +1,18 @@
 ---
-import Planche from './Planche.astro';
-import Monogramme from './Monogramme.astro';
-import Todo from './Todo.astro';
-import { publicFileExists } from '../lib/data.js';
-const { site, planche } = Astro.props;
-const c = site.contact;
-const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-const cvExiste = publicFileExists(site.cv);
+interface Props { c: any; cvHref: string; cvLabel: string }
+const { c, cvHref, cvLabel } = Astro.props;
 // L'adresse n'apparaît jamais en clair dans le HTML : les deux moitiés sont inversées
 // et rassemblées par le script ci-dessous.
-const rev = (s) => [...s].reverse().join('');
+const rev = (s: string) => [...s].reverse().join('');
 ---
-<Planche num={planche.num} titre={planche.titre} id={planche.ancre} sousTitre={c.texte}>
-  <div class="contact">
-    <ul class="contact__liste" role="list">
+<section class="contact on-dark" id="contact" aria-labelledby="contact-titre">
+  <div class="wrap contact__inner">
+    <div>
+      <p class="mono contact__label">Contact</p>
+      <h2 id="contact-titre" class="contact__title">{c.titre}</h2>
+      <p class="contact__text">{c.texte}</p>
+    </div>
+    <ul class="contact__list" role="list">
       <li>
         <span class="mono">Email</span>
         <span class="contact__email" data-u={rev(c.email_user)} data-d={rev(c.email_domain)}>
@@ -24,21 +23,17 @@ const rev = (s) => [...s].reverse().join('');
         <span class="mono">LinkedIn</span>
         <a href={c.linkedin} rel="noopener">{c.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>
       </li>
-      {cvExiste && (
-        <li>
-          <span class="mono">CV</span>
-          <a href={`${base}${site.cv}`} download>Télécharger le CV (PDF)</a>
-        </li>
-      )}
-      {!cvExiste && <Todo texte="déposer public/cv/CV_Mano_Lecocq.pdf pour afficher le lien CV" />}
+      <li>
+        <span class="mono">CV</span>
+        <a href={cvHref} download>{cvLabel} <span aria-hidden="true">↓</span></a>
+      </li>
       <li>
         <span class="mono">Lieu</span>
-        <span>{site.ville}</span>
+        <span>{c.ville}</span>
       </li>
     </ul>
-    <div class="contact__sceau" aria-hidden="true"><Monogramme size={120} /></div>
   </div>
-</Planche>
+</section>
 
 <script>
   document.querySelectorAll<HTMLElement>('.contact__email').forEach((el) => {
@@ -52,22 +47,23 @@ const rev = (s) => [...s].reverse().join('');
 </script>
 
 <style>
-  .contact { display: grid; gap: var(--space-6); align-items: center; }
-  .contact__liste { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
-  .contact__liste li {
-    display: grid;
-    gap: var(--space-1);
-    padding: var(--space-3) 0;
-    border-bottom: var(--stroke) solid var(--line);
-    font-size: var(--fs-lead);
-    overflow-wrap: anywhere;
+  .contact { background: var(--dark); color: var(--on-dark); padding-block: var(--space-8); }
+  .contact__inner { display: grid; gap: var(--space-7); }
+  .contact__label { color: var(--on-dark-mute); display: flex; align-items: center; gap: var(--space-3); }
+  .contact__label::before { content: ''; width: 9px; height: 9px; background: var(--accent-on-dark); }
+  .contact__title { font-size: var(--fs-section); font-weight: 800; letter-spacing: -0.045em; line-height: 0.95; margin-top: var(--space-3); max-width: 12ch; }
+  .contact__text { color: var(--on-dark-mute); font-size: var(--fs-lg); margin-top: var(--space-4); }
+  .contact__list { list-style: none; padding: 0; align-self: end; }
+  .contact__list li { display: grid; gap: 0.2rem; padding: var(--space-3) 0; border-top: 1px solid var(--on-dark-line); font-size: var(--fs-lg); overflow-wrap: anywhere; }
+  .contact__list .mono { color: var(--on-dark-mute); }
+  .contact__list a, .contact__list :global(.contact__email a) {
+    display: inline-flex; align-items: center; min-height: var(--tap);
+    color: var(--on-dark); text-decoration-color: var(--accent-on-dark); font-weight: 600;
   }
-  .contact__liste a { display: inline-flex; align-items: center; min-height: var(--tap); }
-  .contact__liste :global(.contact__email a) { display: inline-flex; align-items: center; min-height: var(--tap); }
-  .contact__sceau { display: none; color: var(--ink); justify-self: center; }
-  @media (min-width: 720px) {
-    .contact { grid-template-columns: 1fr auto; gap: var(--space-8); }
-    .contact__liste li { grid-template-columns: 7rem 1fr; align-items: center; }
-    .contact__sceau { display: block; }
+  .contact__list a:hover, .contact__list :global(.contact__email a:hover) { color: var(--accent-on-dark); }
+  @media (min-width: 960px) {
+    .contact { padding-block: var(--space-9); }
+    .contact__inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--space-8); }
+    .contact__list li { grid-template-columns: 6rem minmax(0, 1fr); align-items: center; }
   }
 </style>

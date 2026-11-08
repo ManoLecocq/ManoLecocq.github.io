@@ -1,0 +1,115 @@
+# Section Réalisations : 4 études de cas au format Contexte → Ce que j'ai fait → Résultat → Stack.
+# « fait » s'écrit au « je » (ma part). « equipe » s'écrit au « nous ».
+# « preuves » : identifiants de affirmations.yaml, dans l'ordre d'affichage.
+# Les textes acceptent `code`, **gras** et [lien](url).
+
+cas:
+  - id: vpn
+    origine: SAÉ 3.03 · IUT de Valence · équipe de 3
+    titre: VPN multi-site pour 90 boutiques
+    contexte: "Une enseigne lyonnaise ouvre 90 boutiques en Allemagne. Toutes ont exactement le même réseau local, `192.168.1.0/25`. Le siège doit pourtant joindre chaque boutique séparément, et les nomades doivent se connecter de l'extérieur."
+    schema: vpn
+    fait:
+      - "J'ai configuré les pare-feux : pfSense au siège, OPNsense en boutique, filtrage « Deny All »."
+      - "J'ai monté les tunnels IPsec IKEv2 en hub-and-spoke et réglé le conflit d'adresses par NAT 1:1 : vue du siège, chaque boutique a son propre sous-réseau."
+      - "J'ai mis en place le double facteur du VPN nomade : FreeRADIUS et LinOTP (TOTP)."
+      - J'ai centralisé les journaux des pare-feux avec syslog-ng.
+    equipe: Avec Romain Rozanska et Baptiste Chave, nous avons aussi monté la DMZ (Debian 12, proxy Squid, SSH durci) et écrit le plan de tests.
+    resultat:
+      chiffre: 16 / 18
+      texte: "tests validés, dont ceux qui doivent échouer : contournement du proxy bloqué, code TOTP rejoué rejeté. Les 2 échecs, sur la boutique 2, sont documentés."
+    stack: [pfSense, OPNsense, IPsec IKEv2, NAT 1:1, OpenVPN, FreeRADIUS, LinOTP, syslog-ng, Debian 12]
+    preuves: [binat, ipsec-dh, radius, retour-arriere, tests-echec, non-conformes, dmz, limites-303]
+    details:
+      - titre: Choix techniques
+        items:
+          - NAT 1:1 dans les tunnels plutôt que renuméroter les boutiques. La contrainte « même configuration partout » reste respectée.
+          - Suites cryptographiques recommandées par l'ANSSI, PFS, et DPD pour que les tunnels remontent seuls après une micro-coupure.
+          - "Split-tunneling sur le VPN nomade : seuls les flux vers le siège passent dans le tunnel."
+          - "Filtrage par extensions plutôt qu'antivirus ICAP/ClamAV : `squidclamav` n'est plus maintenu sous Debian 12."
+      - titre: Obstacles
+        items:
+          - Passage du WAN d'un OPNsense en IP statique, et la passerelle par défaut disparaît. Recréée à la main et marquée « Upstream ».
+          - "Trafic des boutiques vers la DMZ : sélecteurs de trafic de phase 2 ajoutés pour autoriser `192.168.1.0/25` vers `10.11.1.0/24`."
+      - titre: Limites
+        items:
+          - Routage statique, qui ne tiendrait pas à 90 sites. Piste retenue, OSPF dans les tunnels.
+          - Le pare-feu du siège est un point de défaillance unique. Piste retenue, un cluster HA.
+          - Pas d'inspection du contenu des fichiers téléchargés.
+
+  - id: web
+    origine: SAÉ 4.01 · IUT de Valence · projet de groupe
+    titre: Infrastructure web sécurisée B2C / B2B
+    contexte: Un site de vente de pneus, avec un volet grand public et un volet partenaires (Norauto, Point S). Budget imposé de 10 vCPU et 32 Go de RAM pour toute l'infrastructure.
+    fait:
+      - "J'ai monté le cluster de pare-feux pfSense en CARP : un maître, un secours, sessions synchronisées. Si le maître tombe, le service continue, transferts SFTP en cours compris."
+      - "Le cluster sépare 5 segments réseau (WAN + 4 DMZ). Depuis Internet, seuls le HTTPS vers le reverse proxy et le SFTP du cabinet comptable passent."
+      - "J'ai déployé le SIEM Wazuh : agents sur tous les serveurs compatibles, surveillance d'intégrité des configurations web et des certificats."
+      - "Certains agents Wazuh ne remontaient pas les données de leur serveur : j'ai identifié une incompatibilité avec la version de l'OS."
+    equipe: Le groupe a aussi mis en place le reverse proxy Apache (WAF ModSecurity, load balancer), WordPress, l'authentification B2B par certificat client, le SFTP et le bastion d'administration.
+    resultat:
+      chiffre: 10 vCPU
+      texte: "et 30 Go de RAM au total, dans le budget imposé (répartition indicative) : 5 segments isolés, pare-feux redondants, journaux de tous les serveurs centralisés. Les 6 limites restantes sont classées par priorité."
+    stack: [pfSense, CARP, Wazuh, Apache, ModSecurity, nginx, Active Directory, PKI Microsoft, Guacamole]
+    preuves: [wazuh-fim, load-balancer, criticite-401]
+    details:
+      - titre: Choix techniques
+        items:
+          - "Défense en profondeur : pare-feu et IDS/IPS, puis reverse proxy et WAF, puis application et fail2ban, puis SIEM."
+          - La DMZ Web n'est joignable que depuis le reverse proxy. La DMZ Logs n'a aucun flux sortant vers Internet.
+          - Le SFTP partage le serveur web pour tenir dans les ressources, en connaissance de cause.
+      - titre: Limites
+        items:
+          - Un seul serveur web actif derrière le load balancer, donc un point de défaillance unique.
+          - Flux en HTTP non chiffré entre le reverse proxy et les serveurs web.
+          - /wp-admin exposé à Internet, certificat auto-signé, PKI en ligne.
+
+  - id: script
+    origine: Stage · Thales Global Services · mars → juin 2026
+    titre: Script de suivi de l'obsolescence, en production
+    contexte: Quand un parc grossit, on ne vérifie plus sa cohérence à la main. Il fallait consolider le suivi de l'obsolescence du parc.
+    fait:
+      - J'ai écrit un script PowerShell de consolidation de l'obsolescence, environ 1 700 lignes.
+      - Je l'ai fait passer en production sur un serveur.
+      - J'ai écrit un second script, de réconciliation. Il est fonctionnel en local.
+    resultat:
+      chiffre: Chaque mois
+      texte: le script tourne en production.
+    stack: [PowerShell]
+    preuves: [script-thales]
+    note: Rien d'interne ici. Ni nom de serveur, ni outil, ni chiffre du parc.
+
+  - id: doppelnet
+    origine: PTUT 2026-2027 · IUT de Valence · en cours
+    titre: DoppelNet, un jumeau réseau généré par un agent IA
+    statut: En cours
+    contexte: Tester avant de toucher la production. Un agent IA se connecte aux équipements d'un réseau, récupère leurs configurations et les retranscrit dans un environnement virtuel (Proxmox, Cisco Packet Tracer).
+    fait:
+      - Je suis chef de projet.
+      - "Je développe le site du projet : [doppelnet.vercel.app](https://doppelnet.vercel.app)."
+    resultat:
+      chiffre: En cours
+      texte: "le site du projet est en ligne."
+    lien: { texte: doppelnet.vercel.app, url: "https://doppelnet.vercel.app" }
+    stack: [Proxmox, Cisco Packet Tracer, Agent IA]
+    preuves: []
+
+autres:
+  - titre: Réseau 2 sites et 2 contrôleurs de domaine
+    origine: SAÉ KIFAITOO
+    texte: Schéma et plan d'adressage pour 2 sites, 4 sous-réseaux, maquette sous Proxmox.
+    stack: [Proxmox, Active Directory]
+  - titre: Application Android et serveur Java en TCP
+    origine: SAÉ QuizLink
+    texte: Client Android et serveur Java qui communiquent en sockets TCP, spécifiés en UML.
+    stack: [Android, Java, Sockets TCP]
+  - titre: Scripts d'automatisation
+    origine: R4.05
+    texte: Scripts d'administration en Bash, Python et PowerShell.
+    stack: [Bash, Python, PowerShell]
+  - titre: CV vidéo animé
+    origine: À côté
+    texte: Un CV en vidéo, animé avec Remotion.
+    stack: [Remotion]
+    lien: ""
+    todo: "lien vers le CV vidéo Remotion (laisser vide pour ne pas afficher de lien)"

@@ -1,0 +1,170 @@
+---
+import Preuve from './Preuve.astro';
+import SchemaVpn from './SchemaVpn.astro';
+import Todo from './Todo.astro';
+import { inline } from '../lib/text.js';
+const { data } = Astro.props;
+const schemas = { vpn: SchemaVpn };
+const nbPreuves = (n) => (n === 0 ? '' : n === 1 ? '1 preuve vérifiable' : `${n} preuves vérifiables`);
+---
+<section class="section" id="realisations" aria-labelledby="realisations-titre">
+  <div class="wrap">
+    <header class="section__head">
+      <p class="mono section__label">Réalisations</p>
+      <h2 id="realisations-titre" class="section__title">Ce que j'ai construit.</h2>
+      <p class="section__intro">Contexte, ce que j'ai fait, résultat. Chaque affirmation renvoie à un extrait des documents de projet.</p>
+    </header>
+
+    <div class="cases">
+      {data.cas.map((c, i) => {
+        const Schema = c.schema ? schemas[c.schema] : null;
+        return (
+          <article class="case" id={c.id} aria-labelledby={`${c.id}-titre`}>
+            <header class="case__head">
+              <span class="case__idx mono" aria-hidden="true">0{i + 1}</span>
+              <p class="mono case__origin">
+                {c.origine}
+                {c.statut && <span class="case__status">{c.statut}</span>}
+              </p>
+              <h3 id={`${c.id}-titre`} class="case__title">{c.titre}</h3>
+            </header>
+
+            <div class="case__grid">
+              <div class="case__aside">
+                <h4 class="mono case__k">Contexte</h4>
+                <p set:html={inline(c.contexte)} />
+                {Schema && <div class="case__schema"><Schema /></div>}
+                <h4 class="mono case__k">Stack</h4>
+                <ul class="tags" aria-label="Stack">{c.stack.map((t) => <li>{t}</li>)}</ul>
+                {c.lien && <a class="case__ext" href={c.lien.url} rel="noopener">{c.lien.texte} <span aria-hidden="true">↗</span></a>}
+              </div>
+
+              <div class="case__main">
+                <h4 class="mono case__k">Ce que j'ai fait</h4>
+                <ul class="case__did">{c.fait.map((f) => <li set:html={inline(f)} />)}</ul>
+                {c.equipe && <p class="case__team" set:html={inline(c.equipe)} />}
+                {c.note && <p class="case__note mono">{c.note}</p>}
+
+                <div class="case__result on-dark">
+                  <h4 class="mono case__k">Résultat</h4>
+                  <p><span class="case__num">{c.resultat.chiffre}</span> <span set:html={inline(c.resultat.texte)} /></p>
+                </div>
+              </div>
+            </div>
+
+            {c.preuves.length > 0 && (
+              <div class="case__proofs">
+                <h4 class="case__proofs-title">
+                  <span class="mono">{nbPreuves(c.preuves.length)}</span>
+                </h4>
+                <ul class="claims" role="list">
+                  {c.preuves.map((id) => <Preuve id={id} />)}
+                </ul>
+              </div>
+            )}
+
+            {c.details && (
+              <details class="case__more">
+                <summary><span>Détails techniques</span><span class="case__more-i" aria-hidden="true"></span></summary>
+                <div class="case__more-grid">
+                  {c.details.map((d) => (
+                    <section>
+                      <h5 class="mono case__k">{d.titre}</h5>
+                      <ul>{d.items.map((x) => <li set:html={inline(x)} />)}</ul>
+                    </section>
+                  ))}
+                </div>
+              </details>
+            )}
+          </article>
+        );
+      })}
+    </div>
+
+    <div class="others">
+      <h3 class="mono others__title">Autres projets</h3>
+      <ul class="others__list" role="list">
+        {data.autres.map((o) => (
+          <li>
+            <span class="mono others__origin">{o.origine}</span>
+            <span class="others__name">
+              {o.lien ? <a href={o.lien} rel="noopener">{o.titre} <span aria-hidden="true">↗</span></a> : o.titre}
+            </span>
+            <span class="others__text">{o.texte}</span>
+            <ul class="tags" aria-label="Stack">{o.stack.map((t) => <li>{t}</li>)}</ul>
+            {!o.lien && <Todo texte={o.todo} />}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cases { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
+  .case { min-width: 0; border-top: 2px solid var(--dark); padding-top: var(--space-5); }
+  .case__head { display: grid; gap: var(--space-2); margin-bottom: var(--space-6); }
+  .case__idx { color: var(--accent); font-size: 0.85rem; }
+  .case__origin { color: var(--fg-mute); text-transform: none; font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+  .case__status { background: var(--accent); color: var(--light); padding: 0.15rem 0.45rem; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.68rem; }
+  .case__title { font-size: var(--fs-case); font-weight: 800; letter-spacing: -0.04em; line-height: 1; max-width: 20ch; }
+
+  .case__grid { display: grid; gap: var(--space-6); }
+  .case__k { color: var(--fg-mute); font-weight: 500; letter-spacing: 0.05em; margin: var(--space-5) 0 var(--space-2); font-size: 0.72rem; }
+  .case__aside > .case__k:first-child { margin-top: 0; }
+  .case__main > .case__k:first-child { margin: 0; }
+  .case__schema { margin-top: var(--space-5); max-width: 26rem; }
+  .case__ext { display: inline-flex; align-items: center; min-height: var(--tap); margin-top: var(--space-3); font-weight: 600; color: var(--accent); }
+
+  .case__did { list-style: none; padding: 0; display: grid; }
+  .case__did li { padding: var(--space-3) 0 var(--space-3) 1.4rem; border-top: 1px solid var(--line); position: relative; font-size: 1.04rem; }
+  .case__did li:first-child { border-top: 0; }
+  .case__did li::before { content: ''; position: absolute; left: 0; top: calc(var(--space-3) + 0.75em); width: 0.6rem; height: 2px; background: var(--accent); }
+  .case__did :global(a) { color: var(--accent); font-weight: 600; }
+  .case__team { margin-top: var(--space-3); color: var(--fg-mute); font-size: var(--fs-sm); }
+  .case__note { margin-top: var(--space-3); color: var(--fg-mute); text-transform: none; letter-spacing: 0.01em; }
+
+  .case__result { margin-top: var(--space-5); background: var(--dark); color: var(--on-dark); padding: var(--space-5); }
+  .case__result .case__k { color: var(--on-dark-mute); margin-top: 0; }
+  .case__result p { color: var(--on-dark-mute); max-width: 52ch; }
+  .case__num { display: block; color: var(--on-dark); font-size: clamp(2.2rem, 1.5rem + 2.4vw, 3.4rem); font-weight: 800; letter-spacing: -0.045em; line-height: 1; margin-bottom: var(--space-2); }
+
+  .case__proofs { margin-top: var(--space-6); }
+  .case__proofs-title { margin-bottom: var(--space-2); }
+  .case__proofs-title .mono { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--fg); font-weight: 500; }
+  .case__proofs-title .mono::before { content: ''; width: 9px; height: 9px; background: var(--accent); }
+  .claims { list-style: none; padding: 0; border-bottom: 1px solid var(--line); }
+
+  .case__more { margin-top: var(--space-4); }
+  .case__more summary {
+    display: inline-flex; align-items: center; gap: var(--space-3);
+    min-height: var(--tap); cursor: pointer; list-style: none;
+    font-weight: 600;
+  }
+  .case__more summary::-webkit-details-marker { display: none; }
+  .case__more summary:hover { color: var(--accent); }
+  .case__more-i { position: relative; width: 10px; height: 10px; }
+  .case__more-i::before, .case__more-i::after { content: ''; position: absolute; left: 0; right: 0; top: 4px; height: 1.5px; background: currentColor; }
+  .case__more-i::after { transform: rotate(90deg); transition: transform 180ms var(--ease); }
+  .case__more[open] .case__more-i::after { transform: rotate(0); }
+  .case__more-grid { display: grid; gap: 0 var(--space-6); padding-bottom: var(--space-3); }
+  .case__more-grid ul { padding-left: 1.1rem; display: grid; gap: var(--space-2); font-size: var(--fs-sm); }
+  .case__more-grid li::marker { color: var(--accent); }
+
+  .others { margin-top: var(--space-8); }
+  .others__title { color: var(--fg-mute); font-weight: 500; letter-spacing: 0.04em; margin-bottom: var(--space-3); }
+  .others__list { list-style: none; padding: 0; }
+  .others__list > li { display: grid; gap: 0.3rem; padding: var(--space-4) 0; border-top: 1px solid var(--line); }
+  .others__origin { color: var(--fg-mute); text-transform: none; }
+  .others__name { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.015em; }
+  .others__name a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  .others__text { color: var(--fg-mute); }
+  .others .tags { margin-top: var(--space-1); }
+
+  @media (min-width: 960px) {
+    .case__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--space-8); }
+    .case__more-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .others__list > li { grid-template-columns: 9rem minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(0, 1fr); column-gap: var(--space-5); align-items: baseline; }
+    .others .tags { margin-top: 0; }
+  }
+</style>

@@ -1,0 +1,40 @@
+# Section Expérience. Thales d'abord : c'est l'atout principal.
+# Confidentialité Thales : aucun nom de serveur, d'outil interne, de client, d'IP ni de chiffre interne.
+
+postes:
+  - periode: Sept. 2026 → aujourd'hui
+    type: Alternance
+    poste: Technicien Hosting, Infrastructures systèmes & stockage de données
+    entreprise: Thales
+    lieu: Valence
+    points:
+      - Administrateur système. Je participe au maintien en condition de sécurité (MCS) et au maintien en condition opérationnelle (MCO) des serveurs du site de Valence.
+      - Je participe à l'intégration de nouvelles solutions de virtualisation.
+    tags: [MCO, MCS, Virtualisation, Serveurs]
+
+  - periode: Mars → juin 2026
+    type: Stage
+    poste: Technicien, Product / Service Owner
+    entreprise: Thales Global Services
+    lieu: Valence
+    points:
+      - "J'ai écrit un script PowerShell de 1 700 lignes et je l'ai fait passer en production : il tourne chaque mois."
+      - J'ai supervisé l'infrastructure informatique et suivi ses performances.
+      - J'ai analysé la couverture et la cohérence du parc.
+    lien: { texte: Voir la réalisation, ancre: script }
+    tags: [PowerShell, Supervision, Gestion de parc]
+
+confidentialite: Rien d'interne ici (serveurs, outils, chiffres). Je décris ce que j'ai fait, pas l'infrastructure.
+
+formation:
+  - periode: 2024 → 2027
+    titre: BUT Réseaux & Télécommunications, parcours Cybersécurité
+    lieu: IUT de Valence, Université Grenoble Alpes
+    detail: 3e année en alternance
+  - periode: 2024 → 2026
+    titre: DUT Réseaux et Télécommunications, parcours cybersécurité
+    lieu: IUT de Valence
+    detail: Obtenu en cours de BUT
+  - periode: 2022 → 2024
+    titre: Bac général, spécialités Sciences de l'Ingénieur et Mathématiques
+    lieu: Lycée polyvalent Algoud-Laffemas

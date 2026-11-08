@@ -1,0 +1,192 @@
+---
+// Une affirmation et sa preuve dépliable.
+// Sans JS : le bouton reste caché et la preuve est affichée dépliée.
+// Avec JS (scripts/prouve-le.js) : la preuve se replie et « Voir la preuve » l'ouvre.
+import { getAffirmation } from '../lib/affirmations.js';
+import { inline } from '../lib/text.js';
+
+interface Props { id: string }
+const a = getAffirmation(Astro.props.id);
+const pid = `preuve-${a.id}`;
+---
+<li class="claim" id={`affirmation-${a.id}`} data-claim={a.id}>
+  <div class="claim__row">
+    <p class="claim__text">{a.phrase}</p>
+    <button type="button" class="claim__btn" aria-expanded="true" aria-controls={pid} hidden>
+      <span>Voir la preuve</span><span class="claim__icon" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <div class="proof" id={pid} role="region" aria-label={`Preuve : ${a.phrase}`} tabindex="-1">
+    {a.blocs.map((b) => (
+      <div class:list={['blk', `blk--${b.type}`]}>
+        {b.titre && <p class="blk__title mono">{b.titre}</p>}
+
+        {b.type === 'recette' && (
+          <ul class="tests" role="list">
+            {b.lignes.map((l) => (
+              <li>
+                <span class:list={['st', l.statut === 'conforme' ? 'st--ok' : 'st--ko']}>
+                  <span aria-hidden="true">{l.statut === 'conforme' ? '✓' : '✗'}</span>
+                  {l.statut === 'conforme' ? 'CONFORME' : 'NON CONFORME'}
+                </span>
+                <span class="tests__name" set:html={inline(l.test)} />
+                {(l.attendu || l.obs) && (
+                  <span class="tests__obs">
+                    {l.attendu && <span>Attendu : {l.attendu} </span>}
+                    {l.obs && <span set:html={inline(l.obs)} />}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {b.type === 'etapes' && (
+          <ol class="steps" role="list">
+            {b.etapes.map((e) => (
+              <li><span class="mono steps__k">{e.label}</span><span set:html={inline(e.texte)} /></li>
+            ))}
+          </ol>
+        )}
+
+        {b.type === 'code' && (
+          <pre class="code" tabindex="0" aria-label={b.titre ?? 'Extrait'}><code>{b.contenu.trimEnd()}</code></pre>
+        )}
+
+        {b.type === 'liste' && (
+          <ul class="list">{b.items.map((it) => <li set:html={inline(it)} />)}</ul>
+        )}
+
+        {b.type === 'tableau' && (
+          <div class="table" tabindex="0" role="group" aria-label={b.titre}>
+            <table>
+              <thead><tr>{b.colonnes.map((c) => <th scope="col">{c}</th>)}</tr></thead>
+              <tbody>
+                {b.lignes.map((l) => (
+                  <tr>{l.map((cell, i) => (i === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>))}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    ))}
+
+    {a.capture && (
+      <figure class="shot">
+        <div class="shot__empty" aria-hidden="true"><span class="mono">Capture à venir</span></div>
+        <figcaption class="mono">{a.capture}</figcaption>
+        <Fragment set:html={`<!-- TODO Mano : ${a.capture} -->`} />
+      </figure>
+    )}
+
+    <p class="proof__shows"><strong>Ce que ça montre.</strong> <span set:html={inline(a.montre)} /></p>
+    <p class="proof__src mono">Source : {a.source}{a.note && ` · ${a.note}`}</p>
+  </div>
+</li>
+
+<style>
+  .claim { border-top: 1px solid var(--line); }
+  .claim__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-5);
+    padding-block: var(--space-3);
+  }
+  .claim__text { font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; flex: 1 1 18rem; }
+  .claim__btn {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    min-height: var(--tap);
+    padding: 0 0.9rem;
+    font: 500 0.8rem/1 var(--f-mono);
+    letter-spacing: 0.02em;
+    color: var(--fg);
+    background: transparent;
+    border: 0;
+    box-shadow: inset 0 0 0 1px var(--line);
+    cursor: pointer;
+    transition: box-shadow 150ms, color 150ms, background-color 150ms;
+  }
+  .claim__btn:hover { box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--accent); }
+  .claim__btn[aria-expanded='true'] { background: var(--dark); color: var(--light); box-shadow: none; }
+  .claim__icon { position: relative; width: 10px; height: 10px; }
+  .claim__icon::before, .claim__icon::after { content: ''; position: absolute; left: 0; right: 0; top: 4px; height: 1.5px; background: currentColor; }
+  .claim__icon::after { transform: rotate(90deg); transition: transform 180ms var(--ease); }
+  .claim__btn[aria-expanded='true'] .claim__icon::after { transform: rotate(0); }
+
+  .proof {
+    margin-bottom: var(--space-5);
+    padding: var(--space-5) var(--space-4);
+    background: rgb(12 13 15 / 0.035);
+    border-left: 3px solid var(--accent);
+  }
+  .proof:focus { outline: none; }
+  .proof:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  :global(.js-proofs) .proof:not([hidden]) { animation: proof-in 220ms var(--ease); }
+  @keyframes proof-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .blk + .blk { margin-top: var(--space-5); }
+  .blk__title { color: var(--fg-mute); margin-bottom: var(--space-2); }
+
+  .tests { list-style: none; padding: 0; font-size: var(--fs-sm); }
+  .tests li {
+    display: grid;
+    gap: 0.25rem var(--space-4);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--line);
+  }
+  .tests li:first-child { border-top: 0; padding-top: 0; }
+  .tests__name { font-weight: 600; }
+  .tests__obs { color: var(--fg-mute); }
+  .st {
+    justify-self: start;
+    display: inline-flex; gap: 0.35rem; align-items: center;
+    padding: 0.15rem 0.45rem;
+    font: 500 0.7rem/1.2 var(--f-mono);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .st--ok { color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .st--ko { color: var(--light); background: var(--dark); }
+  @media (min-width: 720px) {
+    .tests li { grid-template-columns: 9.5rem minmax(0, 1fr) minmax(0, 1.1fr); align-items: baseline; }
+  }
+
+  .steps { list-style: none; padding: 0; }
+  .steps li { display: grid; gap: 0.15rem var(--space-4); padding: var(--space-2) 0; border-top: 1px solid var(--line); }
+  .steps li:first-child { border-top: 0; padding-top: 0; }
+  .steps__k { color: var(--fg-mute); padding-top: 0.2rem; }
+  .steps li:last-child .steps__k { color: var(--accent); }
+  @media (min-width: 720px) {
+    .steps li { grid-template-columns: 10rem minmax(0, 1fr); }
+  }
+
+  .code {
+    margin: 0;
+    padding: var(--space-4);
+    overflow-x: auto;
+    background: var(--dark);
+    color: var(--light);
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+
+  .list { padding-left: 1.1rem; display: grid; gap: var(--space-2); }
+  .list li::marker { color: var(--accent); }
+
+  .table { overflow-x: auto; }
+  .table table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: var(--fs-sm); }
+  .table th, .table td { text-align: left; vertical-align: top; padding: var(--space-2) var(--space-3) var(--space-2) 0; border-top: 1px solid var(--line); }
+  .table thead th { font: 500 0.7rem/1.3 var(--f-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-mute); border-top: 0; }
+  .table tbody th { font-weight: 600; }
+
+  .shot { margin: var(--space-5) 0 0; }
+  .shot__empty { display: grid; place-items: center; min-height: 7rem; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg-mute); }
+  .shot figcaption { margin-top: var(--space-2); color: var(--fg-mute); text-transform: none; }
+
+  .proof__shows { margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--line); }
+  .proof__src { margin-top: var(--space-2); color: var(--fg-mute); text-transform: none; letter-spacing: 0.01em; }
+</style>

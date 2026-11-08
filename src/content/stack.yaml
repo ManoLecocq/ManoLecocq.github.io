@@ -1,0 +1,38 @@
+# Section Stack. Uniquement des outils réellement utilisés, avec l'endroit où je m'en suis servi.
+# Pas de niveau, pas de pourcentage.
+domaines:
+  - nom: Réseau
+    outils:
+      - { nom: IPsec IKEv2, ou: "VPN 90 sites" }
+      - { nom: NAT 1:1, ou: "VPN 90 sites" }
+      - { nom: OpenVPN, ou: "VPN nomade" }
+      - { nom: Routage et commutation Cisco, ou: "CCNA 1 et 2" }
+      - { nom: Plan d'adressage, ou: "Réseau 2 sites" }
+
+  - nom: Sécurité
+    outils:
+      - { nom: pfSense, ou: "VPN 90 sites, infra web" }
+      - { nom: OPNsense, ou: "VPN 90 sites" }
+      - { nom: CARP, ou: "Cluster de pare-feux" }
+      - { nom: FreeRADIUS + LinOTP, ou: "MFA TOTP" }
+      - { nom: Wazuh, ou: "SIEM, FIM" }
+      - { nom: syslog-ng, ou: "Logs centralisés" }
+
+  - nom: Systèmes
+    outils:
+      - { nom: MCO / MCS, ou: "Serveurs Thales" }
+      - { nom: Debian 12, ou: "VPN 90 sites" }
+      - { nom: Active Directory, ou: "Réseau 2 sites" }
+
+  - nom: Scripting
+    outils:
+      - { nom: PowerShell, ou: "Script en production" }
+      - { nom: Bash, ou: "Automatisation" }
+      - { nom: Python, ou: "Automatisation" }
+      - { nom: Java, ou: "Serveur TCP" }
+
+  - nom: Virtualisation
+    outils:
+      - { nom: Proxmox, ou: "Maquettes, DoppelNet" }
+      - { nom: Cisco Packet Tracer, ou: "DoppelNet" }
+      - { nom: Solutions de virtualisation, ou: "Intégration chez Thales" }

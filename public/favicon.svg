@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="#f6f2e9"/>
-  <rect x="3" y="3" width="58" height="58" fill="none" stroke="#1c2a3a" stroke-width="3"/>
-  <text x="32" y="42" text-anchor="middle" font-family="Arial Black, Helvetica, sans-serif" font-weight="900" font-size="25" fill="#1c2a3a">ML</text>
-  <line x1="13" y1="49" x2="51" y2="49" stroke="#e8590c" stroke-width="3.5"/>
+  <rect width="64" height="64" fill="#0c0d0f"/>
+  <text x="9" y="45" font-family="Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="30" letter-spacing="-2" fill="#eef0f3">ML</text>
+  <rect x="48" y="38" width="8" height="8" fill="#2b44ff"/>
 </svg>

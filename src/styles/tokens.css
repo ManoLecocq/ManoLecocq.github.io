@@ -1,44 +1,44 @@
 /* Jetons de design.
-   Toutes les couleurs passent par ces variables : un thème sombre pourra
-   plus tard redéfinir ce bloc sous :root[data-theme="dark"] sans toucher aux composants. */
+   Palette : 2 neutres (clair froid, noir) + 1 accent (cobalt). Les gris sont des teintes de ces neutres.
+   Toutes les couleurs passent par ces variables : un thème sombre pourra redéfinir ce bloc
+   sous :root[data-theme="dark"] sans toucher aux composants. */
 :root {
-  /* Papier et encre */
-  --paper: #f6f2e9;
-  --paper-raised: #fbf8f2;      /* cartes, tiroirs */
-  --paper-sunk: #efe9dc;        /* blocs de code, cartouches */
-  --ink: #1c2a3a;               /* texte et traits principaux · 13:1 sur papier */
-  --ink-soft: #4a5868;          /* texte secondaire · 6.5:1 */
-  --ink-faint: #5a6676;         /* labels mono · 5.2:1 */
-  --line: rgb(28 42 58 / 0.22); /* traits fins */
-  --line-strong: rgb(28 42 58 / 0.6);
-  --grid-minor: rgb(28 42 58 / 0.045);
-  --grid-major: rgb(28 42 58 / 0.08);
+  --light: #eef0f3;
+  --dark: #0c0d0f;
+  --accent: #2b44ff;            /* 5.4:1 sur clair */
 
-  /* Accent unique : orange signal, réservé aux éléments actifs */
-  --accent: #e8590c;            /* traits, soulignés, focus (3.2:1, non-texte) */
-  --accent-ink: #b23f06;        /* texte en accent · 5.2:1 */
-  --accent-wash: rgb(232 89 12 / 0.09);
-  --on-accent: #ffffff;
+  --bg: var(--light);
+  --fg: var(--dark);
+  --fg-mute: #545a62;           /* noir adouci · 6.1:1 sur clair */
+  --line: rgb(12 13 15 / 0.14);
+  --line-strong: var(--dark);
 
-  /* Statuts de recette (toujours accompagnés du libellé écrit) */
-  --ok: #2f6b3a;
-  --ko: #a3341f;
+  /* Sur les aplats noirs */
+  --on-dark: var(--light);
+  --on-dark-mute: #a3a9b1;      /* 8.2:1 sur noir */
+  --on-dark-line: rgb(238 240 243 / 0.14);
+  --accent-on-dark: #8c99ff;    /* cobalt éclairci · 7.5:1 sur noir */
 
-  /* Typographie */
-  --f-title: 'Archivo Variable', 'Archivo', 'Helvetica Neue', sans-serif;
-  --f-text: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
-  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* Statuts de test : libellé toujours écrit, la couleur ne fait que le doubler */
+  --ok: var(--accent);
+  --ko: var(--dark);
 
-  --fs-mono: 0.78rem;
-  --fs-small: 0.92rem;
-  --fs-body: 1.0625rem;
-  --fs-lead: clamp(1.125rem, 1rem + 0.5vw, 1.3rem);
-  --fs-h3: clamp(1.2rem, 1.05rem + 0.6vw, 1.45rem);
-  --fs-h2: clamp(1.6rem, 1.2rem + 1.8vw, 2.5rem);
-  --fs-display: clamp(2.6rem, 1.6rem + 5vw, 5.4rem);
-  --fs-problem: clamp(1.45rem, 1.05rem + 2vw, 2.55rem);
+  /* Typographie : uniquement des sans-serif et un mono. Aucune police à empattements. */
+  --f-sans: 'Host Grotesk Variable', 'Host Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+  --f-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'DejaVu Sans Mono',
+    'Liberation Mono', monospace;
 
-  /* Espacements et mise en page */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.9rem;
+  --fs-base: 1.0625rem;
+  --fs-lg: clamp(1.15rem, 1.05rem + 0.45vw, 1.35rem);
+  --fs-xl: clamp(1.35rem, 1.1rem + 1.1vw, 1.9rem);
+  --fs-section: clamp(2.4rem, 1.6rem + 4vw, 5rem);
+  --fs-case: clamp(1.9rem, 1.3rem + 2.6vw, 3.4rem);
+  --fs-hero: clamp(4rem, 1.5rem + 11vw, 11rem);
+  --fs-num: clamp(2.9rem, 1.8rem + 3.6vw, 4.75rem);
+
   --gutter: 16px;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -48,16 +48,17 @@
   --space-6: 2rem;
   --space-7: 3rem;
   --space-8: 5rem;
-  --measure: 66ch;
-  --page-max: 72rem;
-  --radius: 2px;
-  --stroke: 1px;
+  --space-9: 8rem;
+  --measure: 62ch;
+  --page-max: 84rem;
   --tap: 44px;
-
+  --header-h: 4.25rem;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --dur: 450ms;
 }
 
 @media (min-width: 720px) {
   :root { --gutter: 32px; }
+}
+@media (min-width: 1100px) {
+  :root { --gutter: 48px; }
 }

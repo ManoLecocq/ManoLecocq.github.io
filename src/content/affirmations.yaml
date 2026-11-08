@@ -2,7 +2,7 @@
 # Chaque preuve vient des documents de sources/ ou de la consigne. Ne rien ajouter qui n'y figure pas.
 #
 # Champs :
-#   id       identifiant utilisé dans les autres fichiers (constat, preuves, projets)
+#   id       identifiant cité dans realisations.yaml (liste « preuves »)
 #   phrase   l'affirmation, telle qu'on pourrait la lire sur un CV
 #   blocs    le contenu de la pièce jointe, dans l'ordre. Types :
 #              recette  → lignes de cahier de tests { test, attendu, statut: conforme|non-conforme, obs }
@@ -205,7 +205,7 @@
           statut: conforme
           obs: Masquage des doublons IP boutique.
   capture: Capture des entrées de phase 2 (BINAT) sur le pfSense du siège
-  montre: Le cahier des charges imposait la même IP partout. J'ai gardé la contrainte et réglé le problème dans le tunnel. La visibilité de la boutique 2 reste non conforme sur deux tests (pièce 02).
+  montre: Le cahier des charges imposait la même IP partout. J'ai gardé la contrainte et réglé le problème dans le tunnel. La visibilité de la boutique 2 reste non conforme sur deux tests, documentés plus bas.
   source: Note de synthèse SAÉ 3.03, §2.1 et §2.2, et cahier de tests, tableau 2
 
 - id: dmz

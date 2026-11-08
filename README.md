@@ -1,6 +1,6 @@
 # Portfolio · Mano Lecocq
 
-Site statique (Astro) qui répond à une question : *comment prouver qu'on est prêt pour la production quand on a surtout travaillé sur des maquettes ?* Chaque affirmation du site a un bouton **Prouve-le** qui ouvre sa pièce justificative, tirée des documents de projet.
+Site statique (Astro) pour les recruteurs : expérience, 4 réalisations, stack, certifications, contact. Chaque réalisation liste des affirmations, et chacune a un bouton **Voir la preuve** qui ouvre un extrait des documents de projet.
 
 ## Lancer en local
 
@@ -19,15 +19,16 @@ Tout le texte est dans `src/content/`. Il n'y a pas besoin de toucher aux compos
 
 | Fichier | Contenu |
 |---|---|
-| `site.yaml` | Nom, accroche, problématique, contact, sommaire |
-| `constat.yaml` | Planche 01 : le tableau maquette / production et le texte |
-| `preuves.yaml` | Planche 02 : les 4 types de preuves et leurs affirmations |
-| `affirmations.yaml` | Les 12 affirmations « Prouve-le » et leurs pièces jointes |
-| `projets.yaml` | Planche 03 : les 4 fiches, les vignettes, le CV vidéo |
-| `competences.yaml` | Planche 04 : la matrice compétences × projets |
-| `certifications.yaml` | Planche 05 : `status: obtenu` est affiché, `status: en cours` ne l'est pas |
-| `parcours.yaml` | Planche 06 : études et expériences |
-| `reponse.yaml` | Planche 07 : conclusion, limites, prochaines étapes |
+| `site.yaml` | Nom, balises meta, chemin du CV, menu, bloc contact |
+| `accueil.yaml` | Hero : rôle, situation, les 3 chiffres du bloc noir, la ligne DoppelNet, libellés des boutons |
+| `experience.yaml` | Alternance et stage Thales, phrase de confidentialité, formation |
+| `realisations.yaml` | Les 4 fiches (contexte, ce que j'ai fait, résultat, stack, preuves, détails) et « Autres projets » |
+| `affirmations.yaml` | Les 12 affirmations « Voir la preuve » et leurs extraits |
+| `stack.yaml` | Les outils par domaine, avec l'endroit où ils ont servi |
+| `certifications.yaml` | `status: obtenu` est affiché, `status: en cours` apparaît en « En préparation », `status: masque` n'apparaît pas |
+| `competences.yaml` | La matrice compétences du BUT × projets, affichée sur `/but` |
+
+La page `/but` (matrice pour l'IUT) n'est liée nulle part et porte `noindex`. Il faut donner son adresse directement.
 
 Dans les textes :
 - `` `code` `` s'affiche en police mono ;
@@ -47,13 +48,13 @@ grep -rn "TODO Mano\|todo:" src/
 ### Ajouter une affirmation
 
 1. Ajouter une entrée dans `affirmations.yaml`, avec un `id`, une `phrase`, des `blocs`, `montre` et `source`.
-2. Citer son `id` dans `preuves.yaml` (liste `affirmations`) ou dans une fiche de `projets.yaml`.
+2. Citer son `id` dans la liste `preuves` d'une fiche de `realisations.yaml`.
 
-Le compteur se met à jour tout seul. **Règle à garder : une preuve doit venir d'un vrai document. On n'invente ni log, ni sortie de commande.**
+Le nombre « N preuves vérifiables » de la fiche se met à jour tout seul. **Règle à garder : une preuve doit venir d'un vrai document. On n'invente ni log, ni sortie de commande.**
 
 ### Fichiers à déposer
 
-- `public/cv/CV_Mano_Lecocq.pdf` : les liens « CV » apparaissent dès que ce fichier existe.
+- `public/cv/CV_Mano_Lecocq.pdf` : les boutons CV pointent vers ce fichier. Tant qu'il manque, ils mènent à une 404 et le build affiche un avertissement.
 - `public/og-image.png` : l'image de partage (1200×630). Il y en a déjà une, générée.
 
 ## Déployer
@@ -77,13 +78,12 @@ Importer le dépôt. `netlify.toml` contient déjà la commande et le dossier de
 
 ## Choix techniques
 
-- **Astro** génère le HTML au build. Sans JavaScript, toutes les preuves sont lisibles, dépliées. Le JS (environ 3 Ko) ne fait que replier les pièces, tenir le compteur, piloter la matrice et assembler l'email.
-- **Polices en local** via `@fontsource` : Archivo (titres), Atkinson Hyperlegible Next (texte), IBM Plex Mono (labels). Aucun appel à Google.
-- **Couleurs** : tout passe par les variables de `src/styles/tokens.css`. Un thème sombre pourra redéfinir ce bloc sans toucher aux composants.
+- **Astro** génère le HTML au build. Sans JavaScript, toutes les preuves sont lisibles, dépliées. Le JS ne fait que replier les preuves, piloter la matrice de `/but` et assembler l'email.
+- **Polices en local** via `@fontsource` : Host Grotesk (titres et texte) et DM Mono (labels techniques). Aucun appel à Google, aucune police à empattements : la pile de secours se termine par `sans-serif`.
+- **Couleurs** : deux neutres (clair, quasi noir) et un accent bleu, définis dans `src/styles/tokens.css`.
 - **Accessibilité** :
-  - les boutons « Prouve-le » ont `aria-expanded` et `aria-controls` ;
-  - Échap referme une pièce et rend le focus au bouton ;
-  - le compteur est en `aria-live` ;
-  - `prefers-reduced-motion` coupe toutes les animations ;
+  - les boutons « Voir la preuve » ont `aria-expanded` et `aria-controls` ;
+  - Échap referme une preuve et rend le focus au bouton ;
+  - `prefers-reduced-motion` coupe toutes les transitions ;
   - les cibles tactiles font au moins 44 px.
 - Les PDF de `sources/` ne sont pas publiés (ils sont dans `.gitignore`).
