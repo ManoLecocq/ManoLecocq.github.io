@@ -1,0 +1,47 @@
+---
+import Planche from './Planche.astro';
+import Todo from './Todo.astro';
+const { data, planche } = Astro.props;
+const obtenues = data.items.filter((c) => c.status === 'obtenu');
+---
+<Planche num={planche.num} titre={planche.titre} id={planche.ancre} sousTitre={data.sous_titre}>
+  <ul class="certifs" role="list">
+    {obtenues.map((c) => (
+      <li class="certif" data-reveal>
+        <span class="certif__stamp mono" aria-hidden="true">✓</span>
+        <div>
+          <p class="certif__nom">{c.nom}</p>
+          {c.organisme && <p class="certif__org mono">{c.organisme}</p>}
+          {c.verif && <a class="certif__verif" href={c.verif} rel="noopener">Vérifier <span aria-hidden="true">↗</span></a>}
+          <Todo texte={c.todo} />
+        </div>
+      </li>
+    ))}
+  </ul>
+</Planche>
+
+<style>
+  .certifs { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+  .certif {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-3);
+    align-items: start;
+    padding: var(--space-4);
+    background: var(--paper-raised);
+    border: var(--stroke) solid var(--line-strong);
+  }
+  .certif__stamp {
+    display: grid; place-items: center;
+    width: 2rem; height: 2rem;
+    border: 1.5px solid var(--ok);
+    color: var(--ok);
+    border-radius: 50%;
+    font-size: 0.9rem;
+  }
+  .certif__nom { margin: 0; font-weight: 600; line-height: 1.35; }
+  .certif__org { margin: var(--space-1) 0 0; }
+  .certif__verif { display: inline-flex; align-items: center; min-height: var(--tap); font-family: var(--f-mono); font-size: 0.78rem; }
+  @media (min-width: 720px) { .certifs { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .certifs { grid-template-columns: repeat(3, 1fr); } }
+</style>

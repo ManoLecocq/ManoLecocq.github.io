@@ -1,0 +1,20 @@
+# Planche 04 · Compétences du BUT R&T
+# Croisement proposé à partir des descriptions de projets. À valider par Mano.
+sous_titre: Les cinq compétences du BUT R&T, croisées avec mes projets. Choisissez une compétence pour voir où je l'ai travaillée.
+
+competences:
+  - { id: adm, court: ADM, nom: Administrer, detail: les réseaux et l'Internet }
+  - { id: con, court: CON, nom: Connecter, detail: les entreprises et les usagers }
+  - { id: pro, court: PRO, nom: Programmer, detail: des outils pour les R&T }
+  - { id: sec, court: SÉC, nom: Sécuriser, detail: les systèmes informatiques communicants }
+  - { id: sur, court: SUR, nom: Surveiller, detail: un système d'information sécurisé }
+
+# projet → compétences mobilisées. "titre" est le libellé court affiché dans la matrice.
+lignes:
+  - { projet: sae303, titre: SAÉ 3.03 · Multi-site, ancre: fiche-sae303, competences: [adm, con, sec, sur] }
+  - { projet: sae401, titre: SAÉ 4.01 · PneusForEver, ancre: fiche-sae401, competences: [adm, con, sec, sur] }
+  - { projet: thales, titre: Stage Thales, ancre: fiche-thales, competences: [adm, pro, sur] }
+  - { projet: ptut, titre: PTUT · DoppelNet, ancre: fiche-ptut, competences: [adm, pro] }
+  - { projet: kifaitoo, titre: SAÉ KIFAITOO, ancre: vignette-kifaitoo, competences: [adm, con] }
+  - { projet: quizlink, titre: SAÉ QuizLink, ancre: vignette-quizlink, competences: [pro] }
+  - { projet: scripts, titre: Scripts R4.05, ancre: vignette-scripts, competences: [adm, pro] }

@@ -1,0 +1,44 @@
+---
+import Planche from './Planche.astro';
+import Affirmation from './Affirmation.astro';
+import { inline } from '../lib/text.js';
+const { data, planche } = Astro.props;
+---
+<Planche num={planche.num} titre={planche.titre} id={planche.ancre} sousTitre={data.sous_titre}>
+  <div class="constat">
+    <div class="compar" data-reveal role="group" aria-label="Maquette contre production">
+      <table>
+        <thead>
+          <tr>{data.comparatif.colonnes.map((c, i) => <th scope="col" class:list={[i === 1 && 'is-prod']}>{c}</th>)}</tr>
+        </thead>
+        <tbody>
+          {data.comparatif.lignes.map(([a, b]) => (
+            <tr><td>{a}</td><td class="is-prod">{b}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="constat__texte">
+      {data.paragraphes.map((p) => <p set:html={inline(p)} />)}
+      <p class="constat__mode" set:html={inline(data.mode_emploi)} />
+      <Affirmation id={data.affirmation} />
+    </div>
+  </div>
+</Planche>
+
+<style>
+  .constat { display: grid; gap: var(--space-6); }
+  .compar table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); background: var(--paper-raised); border: 1.5px solid var(--ink); }
+  .compar th, .compar td { text-align: left; vertical-align: top; padding: var(--space-3); border-bottom: var(--stroke) solid var(--line); width: 50%; }
+  .compar th { font-family: var(--f-mono); font-weight: 500; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1.5px solid var(--ink); }
+  .compar td + td, .compar th + th { border-left: 1.5px solid var(--ink); }
+  .compar th.is-prod { color: var(--accent-ink); }
+  .compar td.is-prod { font-weight: 600; }
+  .compar tr:last-child td { border-bottom: 0; }
+  .constat__mode { padding: var(--space-3) var(--space-4); background: var(--accent-wash); border-left: 3px solid var(--accent); }
+  @media (min-width: 960px) {
+    .constat { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: var(--space-7); align-items: start; }
+    .compar { position: sticky; top: 5rem; }
+  }
+</style>

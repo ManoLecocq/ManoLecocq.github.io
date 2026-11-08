@@ -1,0 +1,43 @@
+# Planche 05 · Certifications
+# status: "obtenu" (affiché), "en cours" (masqué, cité dans les prochaines étapes de la planche 07)
+#         ou "masque" (masqué partout).
+# verif: lien de vérification (Credly, etc.). Vide = pas de lien.
+sous_titre: Ce qui est validé par un organisme extérieur.
+
+items:
+  - nom: CCNA 1 · Introduction to Networks
+    organisme: Cisco Networking Academy
+    status: obtenu
+    verif: ""
+  - nom: CCNA 2 · Switching, Routing and Wireless Essentials
+    organisme: Cisco Networking Academy
+    status: obtenu
+    verif: ""
+  - nom: Ethical Hacker
+    organisme: Cisco Networking Academy
+    status: obtenu
+    verif: ""
+  - nom: "Virtualization Setup : Installation and System Configuration"
+    organisme: ""
+    # Masquée tant que l'organisme n'est pas retrouvé. Repasser à "obtenu" pour l'afficher.
+    status: masque
+    verif: ""
+    todo: "organisme et lien de vérification pour Virtualization Setup, puis repasser status à obtenu"
+  - nom: CLES Anglais · niveau B1
+    organisme: CLES
+    status: obtenu
+    verif: ""
+  - nom: Permis de conduire
+    organisme: ""
+    status: obtenu
+    verif: ""
+
+  # Badges en préparation : passer status à "obtenu" une fois validés.
+  - nom: "Microsoft Applied Skills : Administer Active Directory Domain Services"
+    organisme: Microsoft
+    status: en cours
+    verif: ""
+  - nom: "Microsoft Applied Skills : Protéger les informations dans Microsoft 365 Copilot avec Microsoft Purview"
+    organisme: Microsoft
+    status: en cours
+    verif: ""

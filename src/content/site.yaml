@@ -1,0 +1,49 @@
+# Identité et page d'accueil.
+# Les textes acceptent `code`, **gras** et [lien](#ancre).
+
+nom: Mano Lecocq
+positionnement: Alternant Technicien Hosting chez Thales · BUT R&T Cybersécurité
+ville: Valence, Auvergne-Rhône-Alpes
+
+# La problématique, fil rouge du site.
+problematique: Comment prouver qu’on est prêt pour la production quand on a surtout travaillé sur des maquettes ?
+
+# Petite annotation sous la problématique.
+annotation_accueil: Un CV dit « VPN, pare-feu, Active Directory ». Ici, chaque affirmation a sa pièce justificative.
+
+# Cartouche de plan affiché à droite de l'accueil.
+cartouche:
+  - { label: Auteur, valeur: Mano Lecocq }
+  - { label: Formation, valeur: "BUT R&T Cybersécurité, 3e année" }
+  - { label: Établissement, valeur: IUT de Valence (UGA) }
+  - { label: Poste, valeur: "Alternant, Thales Valence" }
+  - { label: Révision, valeur: A · nov. 2026 }
+
+boutons:
+  projets: Voir mes projets
+  contact: Me contacter
+
+# TODO Mano : déposer le CV dans public/cv/ sous ce nom. Le lien apparaît tout seul dès que le fichier existe.
+cv: cv/CV_Mano_Lecocq.pdf
+
+contact:
+  texte: Pour parler d'un projet, d'une preuve ou d'une opportunité, écrivez-moi.
+  # L'adresse est découpée pour ne pas apparaître en clair dans le HTML (anti-robots).
+  email_user: mano.lecocq2017
+  email_domain: gmail.com
+  linkedin: https://www.linkedin.com/in/mano-lecocq
+
+meta:
+  titre: Mano Lecocq · Réseaux & cybersécurité
+  description: Portfolio de Mano Lecocq, alternant Technicien Hosting chez Thales et étudiant en BUT R&T Cybersécurité. Des projets réseau et sécurité présentés avec leurs preuves.
+
+# Sommaire : numéro de planche, titre, ancre.
+planches:
+  - { num: "01", titre: Le constat, ancre: constat }
+  - { num: "02", titre: Mes preuves, ancre: preuves }
+  - { num: "03", titre: Projets, ancre: projets }
+  - { num: "04", titre: Compétences, ancre: competences }
+  - { num: "05", titre: Certifications, ancre: certifications }
+  - { num: "06", titre: Parcours, ancre: parcours }
+  - { num: "07", titre: Ma réponse, ancre: reponse }
+  - { num: "08", titre: Contact, ancre: contact }

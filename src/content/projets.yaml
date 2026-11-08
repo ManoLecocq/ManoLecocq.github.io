@@ -1,0 +1,119 @@
+# Planche 03 · Projets
+# « ma_part » s'écrit au « je » : ce que Mano a fait lui-même.
+# « equipe » s'écrit au « nous » : ce que l'équipe a fait.
+# « affirmations » : identifiants de affirmations.yaml affichés dans la fiche.
+# « todo » : rendu en commentaire HTML <!-- TODO Mano : ... --> dans la page.
+
+sous_titre: Quatre projets détaillés, chacun avec ce qui a marché et ce qui n'a pas marché.
+
+fiches:
+  - id: sae303
+    num: F1
+    etiquette: SAÉ 3.03 · IUT de Valence
+    titre: Réseau multi-site pour 90 franchises
+    equipe: En équipe avec Romain Rozanska et Baptiste Chave.
+    contexte: Une entreprise lyonnaise ouvre 90 boutiques franchisées en Allemagne. Toutes doivent avoir exactement la même configuration réseau, avec le LAN `192.168.1.0/25` partout. Le siège doit pourtant joindre chaque boutique séparément, et les salariés nomades doivent se connecter de l'extérieur.
+    schema: sae303
+    affirmations: [binat, dmz]
+    ma_part:
+      - "**Les pare-feux** : pfSense au siège, OPNsense en boutique. Filtrage « Deny All », tunnels IPsec IKEv2 en hub-and-spoke, NAT 1:1 pour distinguer les boutiques."
+      - "**Le serveur RADIUS** : FreeRADIUS et LinOTP pour le double facteur (TOTP) du VPN nomade OpenVPN."
+      - "**Le serveur de logs** : syslog-ng, qui centralise les journaux envoyés par les pare-feux des boutiques (UDP 514)."
+    equipe_part:
+      - "La DMZ et son serveur Debian 12 : proxy Squid, SSH durci, MariaDB en écoute locale."
+      - Le cahier de tests et la note de synthèse.
+    choix:
+      - NAT 1:1 dans les tunnels plutôt que de renuméroter les boutiques. La contrainte « même configuration partout » reste respectée.
+      - Suites cryptographiques recommandées par l'ANSSI, PFS, et DPD pour que les tunnels remontent seuls après une micro-coupure.
+      - "Split-tunneling sur le VPN nomade : seuls les flux vers le siège passent dans le tunnel, le reste sort par la connexion de l'utilisateur."
+      - "Filtrage par extensions plutôt qu'antivirus ICAP/ClamAV : `squidclamav` n'est plus maintenu sous Debian 12, et nous avons préféré la stabilité du serveur."
+    obstacles:
+      - Passage de l'IP WAN d'un OPNsense en statique, et la passerelle par défaut disparaît. Il a fallu recréer l'objet « Passerelle » à la main et le marquer « Upstream ».
+      - "Trafic des boutiques vers la DMZ : sélecteurs de trafic de phase 2 supplémentaires pour autoriser `192.168.1.0/25` vers `10.11.1.0/24`."
+      - Désaccord de groupe DH, RADIUS qui rejette tout, filtrage qui coupe tout, GUI du pare-feu perdue. Détails dans les pièces 03, 04 et 05.
+    echecs:
+      - "Deux tests non conformes sur la boutique 2 : l'accès au siège et le ping de son alias NAT. Cause non identifiée à la date de la recette."
+      - Routage statique qui ne tiendrait pas à 90 sites, pare-feu du siège en point de défaillance unique, pas d'inspection du contenu des fichiers.
+    retire: Je fais une sauvegarde avant chaque modification critique d'un pare-feu. Et quand un service refuse tout, je passe en mode debug avant de toucher à la configuration.
+    stack: [pfSense, OPNsense, IPsec IKEv2, NAT 1:1, OpenVPN, FreeRADIUS, LinOTP, syslog-ng, Squid, Debian 12, MariaDB]
+
+  - id: sae401
+    num: F2
+    etiquette: SAÉ 4.01 · IUT de Valence
+    titre: Infrastructure web sécurisée « PneusForEver »
+    equipe: Projet de groupe (groupe 01).
+    contexte: Un site de vente de pneus avec un volet grand public (B2C) et un volet partenaires (B2B, pour Norauto et Point S). Le tout dans un centre d'hébergement virtuel, avec au maximum 10 vCPU et 32 Go de RAM pour toute l'infrastructure.
+    affirmations: [load-balancer, wazuh-fim]
+    ma_part:
+      - "**Le cluster de pare-feux** pfSense en CARP : un maître, un esclave, une IP virtuelle partagée. La synchronisation des sessions garde le service, transferts SFTP en cours compris, si le maître tombe. Le cluster porte aussi DNS, NTP et l'IDS/IPS."
+      - "**Le SIEM Wazuh** : agents sur tous les serveurs compatibles, collecte de l'ensemble des logs, surveillance d'intégrité (FIM) des configurations web et des certificats."
+    equipe_part:
+      - "Reverse proxy Apache : SSL offloading, WAF ModSecurity (OWASP CRS), load balancer, fail2ban."
+      - "B2C : WordPress sur nginx, backoffice authentifié en LDAP sur l'Active Directory."
+      - "B2B : authentification mutuelle par certificat client (PKI Microsoft) avec vérification de la CRL. Un certificat révoqué est rejeté."
+      - "SFTP pour le cabinet comptable : clé SSH uniquement, chroot, un compte en lecture seule et un en lecture/écriture."
+      - Bastion PAM (Guacamole) avec enregistrement des sessions et TOTP.
+    choix:
+      - "5 segments réseau (WAN, DMZ RP, DMZ Web, DMZ Auth, DMZ Logs) isolés par le cluster de pare-feux. La DMZ Web n'est joignable que depuis le reverse proxy, la DMZ Logs n'a aucun flux sortant vers Internet."
+      - "Défense en profondeur : pare-feu et IDS/IPS, puis reverse proxy et WAF, puis application et fail2ban, puis SIEM."
+      - Le SFTP sur le serveur web pour tenir dans les ressources allouées, en sachant que c'est un risque.
+    obstacles:
+      - "Certains agents Wazuh ne remontaient pas les données de leurs serveurs : la version de l'OS n'était pas compatible avec l'agent."
+    echecs:
+      - "Le serveur web est un point de défaillance unique : un seul backend actif dans le load balancer."
+      - Les flux entre le reverse proxy et les serveurs web passent en HTTP non chiffré.
+      - "/wp-admin exposé à Internet, certificat auto-signé, PKI en ligne. Classement complet dans la pièce 07."
+    # À valider par Mano
+    retire: Un cluster de pare-feux redondant ne suffit pas si le serveur web derrière est seul. La disponibilité se juge sur toute la chaîne.
+    stack: [pfSense, CARP, Wazuh, Apache, ModSecurity, nginx, WordPress, Active Directory, PKI Microsoft, Guacamole, fail2ban, SFTP]
+
+  - id: thales
+    num: F3
+    etiquette: Stage · Thales Global Services, Valence · mars à juin 2026
+    titre: Garder le contrôle d'un parc complexe
+    contexte: Quand un parc informatique grossit, on ne peut plus vérifier sa cohérence à la main. Mon rapport de stage portait sur cette question. Comment garder un SI fiable et sûr malgré la complexité du parc, les contraintes budgétaires et un périmètre qui évolue ?
+    affirmations: []
+    ma_part:
+      - Supervision de l'infrastructure informatique et suivi de performance.
+      - Analyse de la couverture et de la cohérence du parc.
+      - Un script PowerShell de consolidation de l'obsolescence, environ 1 700 lignes. Je l'ai fait passer en production sur un serveur, et il est utilisé tous les mois.
+      - Un script de réconciliation, fonctionnel en local.
+    echecs:
+      - Le script de réconciliation n'a pas été déployé. À la fin du stage, il fonctionne en local.
+    retire: Sur un vrai parc, la surveillance manuelle ne suffit plus. Il faut automatiser la cohérence et le suivi de l'obsolescence.
+    suite: Depuis septembre 2026, je suis alternant chez Thales à Valence, comme Technicien Hosting, Infrastructures systèmes & stockage de données. En tant qu'administrateur système, je participe au maintien en condition de sécurité (MCS) et au maintien en condition opérationnelle (MCO) des serveurs du site de Valence, et à l'intégration de nouvelles solutions de virtualisation.
+    confidentialite: Aucun nom de serveur, d'outil interne, de client ni de chiffre interne. Je m'en tiens à ce que j'ai fait et appris.
+    stack: [PowerShell, Supervision, Automatisation, Gestion de parc, Obsolescence]
+
+  - id: ptut
+    num: F4
+    etiquette: PTUT 2026-2027 · projet de groupe
+    titre: "DoppelNet : dupliquer une infrastructure avec un agent IA"
+    statut: En cours
+    contexte: Avant de toucher à un réseau de production, on aimerait pouvoir tester sur une copie fidèle. Notre agent IA se connecte aux équipements d'un réseau, récupère leurs fichiers de configuration et les retranscrit dans un environnement virtuel (Proxmox, Cisco Packet Tracer).
+    objectif: Disposer d'un jumeau du réseau pour tester avant de toucher la production. C'est la question de ce site, prise par l'autre bout.
+    affirmations: []
+    ma_part:
+      - "**Chef de projet** de DoppelNet."
+      - "**Le site web du projet** : je le développe. [doppelnet.vercel.app](https://doppelnet.vercel.app)"
+    stack: [Proxmox, Cisco Packet Tracer, Agent IA]
+
+vignettes:
+  - id: kifaitoo
+    titre: SAÉ KIFAITOO
+    texte: Schéma réseau et plan d'adressage pour 2 sites (Barnave, Alpes), 4 sous-réseaux, 2 contrôleurs de domaine, maquette sous Proxmox.
+    stack: [Proxmox, Active Directory, Adressage IP]
+  - id: quizlink
+    titre: SAÉ QuizLink
+    texte: Une application Android et un serveur Java qui communiquent en sockets TCP, avec leurs spécifications UML.
+    stack: [Android, Java, Sockets TCP, UML]
+  - id: scripts
+    titre: Scripts d'automatisation
+    texte: Scripts en Bash, Python et PowerShell, réalisés en TP de R4.05.
+    stack: [Bash, Python, PowerShell]
+
+a_cote:
+  titre: À côté · CV vidéo animé
+  texte: Un CV en vidéo, animé avec Remotion.
+  lien: ""
+  todo: "lien vers le CV vidéo Remotion (laisser vide pour ne pas afficher de lien)"

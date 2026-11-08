@@ -1,0 +1,26 @@
+# Planche 07 · Ma réponse
+sous_titre: Une réponse partielle, et c'est voulu.
+
+paragraphes:
+  - Un portfolio ne remplace pas une mise en situation. Je ne peux pas vous montrer ici comment je réagis quand un service tombe pour de vrai et que des utilisateurs attendent.
+  - Ce que je peux faire, c'est réduire le doute. Chaque affirmation de cette page a sa pièce justificative, et ces pièces incluent les tests ratés et les limites de nos architectures. L'entretien peut alors porter sur des choses concrètes plutôt que sur une liste de mots-clés.
+
+pas_encore:
+  titre: Ce que je n'ai pas encore prouvé
+  items:
+    - "**L'échelle** : nos maquettes ont 2 boutiques, pas 90. Je sais ce qui casserait, je ne l'ai pas encore vécu."
+    - "**La durée** : faire vivre une infrastructure sur des mois, avec ses mises à jour et ses changements."
+    - "**Les procédures d'une grande entreprise** : intervenir sur la production avec ses règles, ses validations et ses fenêtres de maintenance."
+
+comment:
+  titre: Comment je compte le prouver
+  items:
+    - "**L'alternance chez Thales** depuis septembre 2026 : MCS et MCO de serveurs en production, intégration de nouvelles solutions de virtualisation. [Voir la fiche](#fiche-thales)"
+    - "**Le PTUT DoppelNet**, qui construit justement un jumeau du réseau pour tester avant de toucher la production. [Voir la fiche](#fiche-ptut)"
+  # Les certifications en cours (certifications.yaml, status: "en cours") s'ajoutent automatiquement ici.
+  prefixe_certifs: "**En préparation** :"
+
+conclusion: Alors, suis-je prêt pour la production ? Pas encore complètement, et ce site ne peut pas l'affirmer à ma place. Il montre comment je travaille quand quelque chose ne marche pas. C'est ce que je vous propose de vérifier en entretien.
+
+# Message affiché quand le lecteur a ouvert toutes les preuves.
+message_fin: Vous avez vérifié tout ce que j'affirme. On en parle en entretien ?

@@ -1,0 +1,73 @@
+---
+import Planche from './Planche.astro';
+import Monogramme from './Monogramme.astro';
+import Todo from './Todo.astro';
+import { publicFileExists } from '../lib/data.js';
+const { site, planche } = Astro.props;
+const c = site.contact;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const cvExiste = publicFileExists(site.cv);
+// L'adresse n'apparaît jamais en clair dans le HTML : les deux moitiés sont inversées
+// et rassemblées par le script ci-dessous.
+const rev = (s) => [...s].reverse().join('');
+---
+<Planche num={planche.num} titre={planche.titre} id={planche.ancre} sousTitre={c.texte}>
+  <div class="contact">
+    <ul class="contact__liste" role="list">
+      <li>
+        <span class="mono">Email</span>
+        <span class="contact__email" data-u={rev(c.email_user)} data-d={rev(c.email_domain)}>
+          Adresse affichée avec JavaScript. Sinon, écrivez-moi sur LinkedIn.
+        </span>
+      </li>
+      <li>
+        <span class="mono">LinkedIn</span>
+        <a href={c.linkedin} rel="noopener">{c.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>
+      </li>
+      {cvExiste && (
+        <li>
+          <span class="mono">CV</span>
+          <a href={`${base}${site.cv}`} download>Télécharger le CV (PDF)</a>
+        </li>
+      )}
+      {!cvExiste && <Todo texte="déposer public/cv/CV_Mano_Lecocq.pdf pour afficher le lien CV" />}
+      <li>
+        <span class="mono">Lieu</span>
+        <span>{site.ville}</span>
+      </li>
+    </ul>
+    <div class="contact__sceau" aria-hidden="true"><Monogramme size={120} /></div>
+  </div>
+</Planche>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.contact__email').forEach((el) => {
+    const rev = (s: string) => [...s].reverse().join('');
+    const adresse = `${rev(el.dataset.u!)}@${rev(el.dataset.d!)}`;
+    const a = document.createElement('a');
+    a.href = `mailto:${adresse}`;
+    a.textContent = adresse;
+    el.replaceChildren(a);
+  });
+</script>
+
+<style>
+  .contact { display: grid; gap: var(--space-6); align-items: center; }
+  .contact__liste { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
+  .contact__liste li {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) 0;
+    border-bottom: var(--stroke) solid var(--line);
+    font-size: var(--fs-lead);
+    overflow-wrap: anywhere;
+  }
+  .contact__liste a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  .contact__liste :global(.contact__email a) { display: inline-flex; align-items: center; min-height: var(--tap); }
+  .contact__sceau { display: none; color: var(--ink); justify-self: center; }
+  @media (min-width: 720px) {
+    .contact { grid-template-columns: 1fr auto; gap: var(--space-8); }
+    .contact__liste li { grid-template-columns: 7rem 1fr; align-items: center; }
+    .contact__sceau { display: block; }
+  }
+</style>

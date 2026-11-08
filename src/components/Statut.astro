@@ -1,0 +1,26 @@
+---
+// Statut façon cahier de recette. Le libellé est toujours écrit, la couleur ne fait que le doubler.
+interface Props { statut: 'conforme' | 'non-conforme' }
+const ok = Astro.props.statut === 'conforme';
+---
+<span class:list={['statut', ok ? 'statut--ok' : 'statut--ko']}>
+  <span aria-hidden="true">{ok ? '✓' : '✗'}</span> {ok ? 'CONFORME' : 'NON CONFORME'}
+</span>
+
+<style>
+  .statut {
+    display: inline-flex;
+    gap: 0.3rem;
+    align-items: center;
+    padding: 0.05rem 0.45rem;
+    font-family: var(--f-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    border: 1.5px solid currentColor;
+    border-radius: var(--radius);
+    white-space: nowrap;
+  }
+  .statut--ok { color: var(--ok); }
+  .statut--ko { color: var(--ko); background: rgb(163 52 31 / 0.07); }
+</style>

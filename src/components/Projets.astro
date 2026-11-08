@@ -1,0 +1,181 @@
+---
+import Planche from './Planche.astro';
+import Affirmation from './Affirmation.astro';
+import Schema303 from './Schema303.astro';
+import Todo from './Todo.astro';
+import { inline } from '../lib/text.js';
+const { data, planche } = Astro.props;
+const schemas = { sae303: Schema303 };
+---
+<Planche num={planche.num} titre={planche.titre} id={planche.ancre} sousTitre={data.sous_titre}>
+  <div class="fiches">
+    {data.fiches.map((f) => {
+      const Schema = f.schema ? schemas[f.schema] : null;
+      return (
+        <article class="fiche" id={`fiche-${f.id}`} aria-labelledby={`fiche-${f.id}-titre`}>
+          <header class="fiche__head" data-reveal>
+            <div class="fiche__meta">
+              <span class="mono fiche__num">{f.num}</span>
+              <span class="mono">{f.etiquette}</span>
+              {f.statut && <span class="fiche__statut mono">{f.statut}</span>}
+            </div>
+            <h3 id={`fiche-${f.id}-titre`}>{f.titre}</h3>
+            {f.equipe && <p class="fiche__equipe">{f.equipe}</p>}
+          </header>
+
+          <div class:list={['fiche__body', Schema && 'has-schema']}>
+            <div class="fiche__main">
+              <section aria-label="Contexte">
+                <h4 class="mono">Contexte</h4>
+                <p set:html={inline(f.contexte)} />
+                {f.objectif && <p set:html={inline(f.objectif)} />}
+              </section>
+
+              {f.ma_part && (
+                <section>
+                  <h4 class="mono">Ce que j'ai fait</h4>
+                  <ul class="puces">{f.ma_part.map((x) => <li set:html={inline(x)} />)}</ul>
+                </section>
+              )}
+              <Todo texte={f.todo} />
+
+              {f.suite && (
+                <section class="fiche__suite">
+                  <h4 class="mono">Et depuis</h4>
+                  <p set:html={inline(f.suite)} />
+                  <Todo texte={f.suite_todo} />
+                </section>
+              )}
+            </div>
+            {Schema && <div class="fiche__schema"><Schema /></div>}
+          </div>
+
+          {f.affirmations.length > 0 && (
+            <div class="fiche__claims">
+              {f.affirmations.map((id) => <Affirmation id={id} />)}
+            </div>
+          )}
+
+          {(f.equipe_part || f.choix || f.obstacles || f.echecs || f.retire) && (
+            <details class="fiche__plus">
+              <summary><span class="mono">Lire la fiche complète</span><span class="fiche__plus-icon" aria-hidden="true"></span></summary>
+              <div class="fiche__grid">
+                {f.equipe_part && (
+                  <section><h4 class="mono">Ce que l'équipe a fait</h4>
+                    <ul class="puces">{f.equipe_part.map((x) => <li set:html={inline(x)} />)}</ul></section>
+                )}
+                {f.choix && (
+                  <section><h4 class="mono">Choix techniques</h4>
+                    <ul class="puces">{f.choix.map((x) => <li set:html={inline(x)} />)}</ul></section>
+                )}
+                {f.obstacles && (
+                  <section><h4 class="mono">Obstacles</h4>
+                    <ul class="puces">{f.obstacles.map((x) => <li set:html={inline(x)} />)}</ul></section>
+                )}
+                {f.echecs && (
+                  <section class="is-ko"><h4 class="mono">Ce qui n'a pas marché, ou pas encore</h4>
+                    <ul class="puces">{f.echecs.map((x) => <li set:html={inline(x)} />)}</ul></section>
+                )}
+                {f.retire && (
+                  <section class="is-retire"><h4 class="mono">Ce que j'en retire</h4><p set:html={inline(f.retire)} /></section>
+                )}
+                {f.confidentialite && <p class="fiche__confid mono">{f.confidentialite}</p>}
+              </div>
+            </details>
+          )}
+
+          <ul class="tags" aria-label="Technologies et thèmes">
+            {f.stack.map((t) => <li>{t}</li>)}
+          </ul>
+          <Todo texte={f.stack_todo} />
+        </article>
+      );
+    })}
+  </div>
+
+  <h3 class="sub">Projets plus courts</h3>
+  <ul class="vignettes" role="list">
+    {data.vignettes.map((v) => (
+      <li class="vignette" id={`vignette-${v.id}`} data-reveal>
+        <h4>{v.titre}</h4>
+        <p set:html={inline(v.texte)} />
+        <ul class="tags tags--small" aria-label="Technologies">{v.stack.map((t) => <li>{t}</li>)}</ul>
+      </li>
+    ))}
+    <li class="vignette vignette--cote" data-reveal>
+      <h4>{data.a_cote.titre}</h4>
+      <p>{data.a_cote.texte}</p>
+      {data.a_cote.lien
+        ? <a href={data.a_cote.lien} rel="noopener">Voir la vidéo <span aria-hidden="true">→</span></a>
+        : <Todo texte={data.a_cote.todo} />}
+    </li>
+  </ul>
+</Planche>
+
+<style>
+  .fiches { display: grid; gap: var(--space-7); }
+  .fiche {
+    background: var(--paper-raised);
+    border: 1.5px solid var(--ink);
+    padding: var(--space-5) var(--space-4);
+    position: relative;
+  }
+  .fiche__meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: center; margin-bottom: var(--space-2); }
+  .fiche__num { color: var(--on-accent); background: var(--ink); padding: 0.1rem 0.4rem; }
+  .fiche__statut { color: var(--accent-ink); border: 1.5px solid var(--accent); padding: 0 0.4rem; }
+  .fiche__head h3 { font-size: var(--fs-h2); font-size: clamp(1.4rem, 1.1rem + 1.3vw, 2rem); font-weight: 750; }
+  .fiche__equipe { color: var(--ink-soft); margin: var(--space-2) 0 0; }
+  .fiche__head { padding-bottom: var(--space-4); border-bottom: var(--stroke) solid var(--line); margin-bottom: var(--space-5); }
+
+  h4.mono { font-family: var(--f-mono); font-weight: 500; font-size: 0.72rem; color: var(--accent-ink); margin: var(--space-5) 0 var(--space-2); font-stretch: 100%; letter-spacing: 0.05em; }
+  .fiche__main > section:first-child h4 { margin-top: 0; }
+  .puces { margin: 0; padding-left: 1.2rem; display: grid; gap: var(--space-2); }
+  .puces li { max-width: var(--measure); }
+  .puces li::marker { color: var(--accent); }
+  .fiche__a-preciser { color: var(--ink-faint); text-transform: none; }
+
+  .fiche__body { display: grid; gap: var(--space-6); }
+  .fiche__schema { justify-self: center; width: 100%; max-width: 26rem; }
+
+  .fiche__claims { margin-top: var(--space-5); padding-top: var(--space-2); border-top: var(--stroke) dashed var(--line-strong); }
+
+  .fiche__plus { margin-top: var(--space-5); border-top: var(--stroke) solid var(--line); }
+  .fiche__plus summary {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: var(--tap); padding-block: var(--space-2);
+    cursor: pointer; list-style: none;
+  }
+  .fiche__plus summary::-webkit-details-marker { display: none; }
+  .fiche__plus summary .mono { color: var(--ink); }
+  .fiche__plus summary:hover .mono { color: var(--accent-ink); }
+  .fiche__plus-icon { width: 14px; height: 14px; position: relative; }
+  .fiche__plus-icon::before, .fiche__plus-icon::after { content: ''; position: absolute; background: var(--ink); left: 0; right: 0; top: 6px; height: 1.5px; }
+  .fiche__plus-icon::after { transform: rotate(90deg); transition: transform 200ms var(--ease); }
+  .fiche__plus[open] .fiche__plus-icon::after { transform: rotate(0); }
+  .fiche__grid { display: grid; gap: 0 var(--space-6); padding-bottom: var(--space-3); }
+  .fiche__grid .is-ko h4 { color: var(--ko); }
+  .is-retire p { font-weight: 600; }
+  .fiche__confid { text-transform: none; margin-top: var(--space-4); }
+
+  .tags { list-style: none; padding: 0; margin: var(--space-5) 0 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .tags li { font-family: var(--f-mono); font-size: 0.72rem; padding: 0.15rem 0.5rem; border: var(--stroke) solid var(--line-strong); border-radius: var(--radius); background: var(--paper); }
+  .tags--small { margin-top: var(--space-3); }
+
+  .sub { font-size: var(--fs-h3); margin: var(--space-8) 0 var(--space-4); }
+  .vignettes { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+  .vignette { border: var(--stroke) solid var(--line-strong); padding: var(--space-4); background: var(--paper-raised); }
+  .vignette h4 { font-size: 1.05rem; margin-bottom: var(--space-2); }
+  .vignette p { font-size: var(--fs-small); margin: 0; }
+  .vignette--cote { border-style: dashed; background: transparent; }
+  .vignette--cote a { display: inline-flex; align-items: center; min-height: var(--tap); font-family: var(--f-mono); font-size: 0.8rem; }
+
+  @media (min-width: 720px) {
+    .fiche { padding: var(--space-6); }
+    .fiche__grid { grid-template-columns: 1fr 1fr; }
+    .vignettes { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1000px) {
+    .fiche__body.has-schema { grid-template-columns: minmax(0, 1fr) 22rem; align-items: start; }
+    .vignettes { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>

@@ -1,0 +1,274 @@
+# Les affirmations « Prouve-le ».
+# Chaque preuve vient des documents de sources/ ou de la consigne. Ne rien ajouter qui n'y figure pas.
+#
+# Champs :
+#   id       identifiant utilisé dans les autres fichiers (constat, preuves, projets)
+#   phrase   l'affirmation, telle qu'on pourrait la lire sur un CV
+#   blocs    le contenu de la pièce jointe, dans l'ordre. Types :
+#              recette  → lignes de cahier de tests { test, attendu, statut: conforme|non-conforme, obs }
+#              etapes   → étapes de diagnostic { label, texte } (texte accepte `code`)
+#              code     → extrait brut { titre, langage, contenu }
+#              liste    → puces { titre, items }
+#              tableau  → { titre, colonnes, lignes }
+#   capture  (optionnel) emplacement vide pour une capture à fournir
+#   montre   la ligne « Ce que ça montre »
+#   source   le document et la section d'où vient la preuve
+
+- id: tests-echec
+  phrase: Nos tests incluent aussi ceux qui doivent échouer.
+  blocs:
+    - type: recette
+      titre: Tests techniques, sécurité
+      lignes:
+        - test: Navigation SANS configurer le proxy.
+          statut: conforme
+          obs: "ÉCHEC ATTENDU : Sortie directe refusée."
+        - test: Réutilisation d'un code TOTP déjà validé.
+          statut: conforme
+          obs: "REJETÉ : Code à usage unique strict."
+        - test: "`ssh root@10.11.1.10`"
+          statut: conforme
+          obs: "BLOQUÉ : Permission denied (Root interdit)."
+        - test: Ping Boutique 1 vers Boutique 2.
+          statut: conforme
+          obs: "ÉCHEC ATTENDU : Flux inter-sites bloqué."
+  montre: Un test qui ne vérifie que le cas où tout marche ne dit rien sur la sécurité. Ici, le test est réussi quand l'attaque ou le contournement échoue.
+  source: Cahier de tests SAÉ 3.03, tableau 2 « Tests techniques »
+
+- id: non-conformes
+  phrase: Nous notons aussi les tests qui échouent.
+  blocs:
+    - type: recette
+      titre: Tests fonctionnels, VPN Lan-to-Lan
+      lignes:
+        - test: Ping vers 10.10.1.1 depuis Boutique 1.
+          attendu: Réponse ICMP.
+          statut: conforme
+          obs: "3 Child SA actifs."
+        - test: Ping vers 10.10.1.1 depuis Boutique 2.
+          attendu: Réponse ICMP.
+          statut: non-conforme
+          obs: Cause non identifiée à la date de la recette.
+        - test: Ping vers alias NAT BTQ2 (192.168.51.1).
+          attendu: Réponse ICMP.
+          statut: non-conforme
+          obs: Cause non identifiée à la date de la recette.
+  montre: Les deux lignes non conformes sont restées dans le cahier telles quelles. Un cahier sans aucun échec, c'est souvent un cahier qu'on a nettoyé.
+  source: Cahier de tests SAÉ 3.03, tableau 1 « Tests fonctionnels »
+
+- id: ipsec-dh
+  phrase: Je sais diagnostiquer un tunnel IPsec qui ne monte pas.
+  blocs:
+    - type: etapes
+      etapes:
+        - label: Symptôme
+          texte: Les phases 2 des tunnels restent au statut « Connecting ».
+        - label: Lecture des journaux
+          texte: "Refus du groupe Diffie-Hellman : `ECP_256` d'un côté, `MODP_2048` de l'autre."
+        - label: Correction
+          texte: Alignement strict des propositions de sécurité (chiffrement, hash, PFS) aux deux extrémités.
+        - label: Résultat
+          texte: Les phases 2 passent à « Installed ».
+    - type: code
+      titre: Suite retenue (résumé de la note)
+      langage: texte
+      contenu: |
+        Phase 1  IKEv2 · AES-128-GCM · SHA-256 · DH Group 14 (2048 bits)
+        Phase 2  AES-128-GCM · PFS activé
+        DPD      activé : redémarrage auto des tunnels après une micro-coupure WAN
+  montre: Je ne me suis pas arrêté à « le tunnel ne marche pas ». Les journaux donnaient la cause exacte, et les choix finaux suivent les suites recommandées par l'ANSSI plutôt que les valeurs par défaut.
+  source: Note de synthèse SAÉ 3.03, §4.2 et §2.4
+
+- id: radius
+  phrase: Je sais trouver pourquoi un serveur RADIUS rejette tout.
+  blocs:
+    - type: etapes
+      etapes:
+        - label: Symptôme
+          texte: Les requêtes d'authentification (UDP 1812) du pare-feu sont systématiquement rejetées par le serveur Debian.
+        - label: Commande
+          texte: "`freeradius -X` : le serveur tourne en mode debug et détaille chaque requête."
+        - label: Cause 1
+          texte: Le « shared secret » n'est pas le même sur le pare-feu (NAS) et sur le serveur.
+        - label: Cause 2
+          texte: "L'adresse IP du pare-feu est mal déclarée dans `clients.conf`."
+        - label: Résultat
+          texte: Une fois les deux corrigées, l'authentification OTP fonctionne.
+    - type: recette
+      titre: Recette du VPN nomade
+      lignes:
+        - test: Saisie du code TOTP Google Auth.
+          attendu: Connexion réussie.
+          statut: conforme
+          obs: "OK : Identifiants validés."
+        - test: Tentative avec code TOTP aléatoire.
+          statut: conforme
+          obs: "REJETÉ : Protection contre l'intrusion."
+  montre: Deux erreurs de configuration donnaient le même symptôme. Le mode debug m'a permis de les séparer au lieu de changer des paramètres au hasard.
+  source: Note de synthèse SAÉ 3.03, §3.2, et cahier de tests
+
+- id: retour-arriere
+  phrase: Quand je me coupe l'accès, je sais revenir en arrière.
+  blocs:
+    - type: etapes
+      titre: "Incident 1 : le filtrage coupe tout"
+      etapes:
+        - label: Symptôme
+          texte: À l'activation de la politique « Deny All », plus aucune connectivité, flux d'administration compris. Impossible de diagnostiquer.
+        - label: Commande
+          texte: "`pfctl -d` désactive temporairement le filtrage pour observer les logs en temps réel."
+        - label: Cause
+          texte: Des flux discrets mais indispensables (DNS, ICMP) étaient bloqués.
+        - label: Retour
+          texte: "Règles créées pour ces flux, puis `pfctl -e` : le moteur de filtrage tourne de façon stable."
+    - type: etapes
+      titre: "Incident 2 : plus d'accès à l'interface du pare-feu"
+      etapes:
+        - label: Symptôme
+          texte: Une erreur sur l'interface d'écoute fait perdre tout accès HTTPS à la GUI.
+        - label: Retour
+          texte: Restauration d'urgence depuis une sauvegarde de configuration XML.
+        - label: Leçon
+          texte: Une sauvegarde (snapshot de VM ou export XML) avant chaque modification critique des règles ou des interfaces.
+  montre: Je casse des choses, comme tout le monde. Ce qui compte, c'est d'avoir un chemin de retour et d'en tirer une règle de travail.
+  source: Note de synthèse SAÉ 3.03, §2.3 et §2.6
+
+- id: limites-303
+  phrase: Je sais dire où notre architecture casse.
+  blocs:
+    - type: liste
+      titre: Limites relevées dans notre propre note
+      items:
+        - "**Routage statique** : 90 boutiques, c'est 90 paires de routes statiques et 90 configurations NAT à saisir à la main au siège. Lourd et propice aux erreurs."
+        - "**SPOF** : sans cluster haute disponibilité, une panne du pare-feu du siège coupe toutes les boutiques des applications en DMZ."
+        - "**Pas d'inspection du contenu** : Squid filtre les URL et les en-têtes, pas le contenu. Un virus caché dans un fichier nommé document.pdf passerait."
+        - "**Performance** : RDP, très utilisé ici, supporte mal la latence ajoutée par les tunnels chiffrés."
+    - type: liste
+      titre: Pistes
+      items:
+        - Un routage dynamique (OSPF) dans les tunnels pour propager seul les nouveaux réseaux.
+        - Un cluster HA actif/passif au siège.
+  montre: La maquette marche avec 2 boutiques. Je sais ce qui ne passerait pas à 90, et par quoi je le remplacerais.
+  source: Note de synthèse SAÉ 3.03, §4.2 et §4.3
+
+- id: criticite-401
+  phrase: Nous classons nos faiblesses par priorité.
+  blocs:
+    - type: tableau
+      titre: Synthèse de la criticité
+      colonnes: [Problème, Impact, Priorité, Solution recommandée]
+      lignes:
+        - [SPOF serveur web, Haute, Haute, Ajouter un second serveur web en backend actif]
+        - [SFTP qui cohabite avec le web, Moyenne, Haute, Déporter le SFTP sur une VM dédiée]
+        - [Certificat auto-signé, Faible, Moyenne, CA publique]
+        - [Flux HTTP entre DMZ, Moyenne, Moyenne, Activer HTTPS interne]
+        - [/wp-admin exposé, Haute, Haute, Liste blanche d'IP + MFA sur l'AD]
+        - [PKI interne en ligne, Haute, Faible, Root CA offline + CA intermédiaires]
+  montre: Lister ses défauts ne suffit pas. Il faut dire lequel traiter en premier, et pourquoi.
+  source: Note de synthèse d'architecture SAÉ 4.01, tableau 3
+
+- id: script-thales
+  phrase: J'ai mis en production un script utilisé tous les mois.
+  blocs:
+    - type: liste
+      titre: Stage chez Thales, mars à juin 2026
+      items:
+        - Un script PowerShell de consolidation de l'obsolescence, environ 1 700 lignes, que j'ai **fait passer en production sur un serveur**. Il est **utilisé tous les mois**.
+        - Un script de réconciliation, **fonctionnel en local seulement** à la fin du stage.
+        - "Le contexte du rapport de stage : garder un SI fiable et sûr malgré la complexité du parc, les contraintes budgétaires et un périmètre qui évolue."
+  montre: Ce code ne tourne plus seulement sur ma machine. Il est en production, sur une infrastructure qui n'est pas une maquette, et il sert chaque mois.
+  source: Rapport de stage (confidentiel)
+  note: Aucun nom de serveur, d'outil interne ni de chiffre interne n'est publié ici.
+
+- id: binat
+  phrase: Je sais faire cohabiter 90 boutiques qui ont la même adresse IP.
+  blocs:
+    - type: code
+      titre: Le problème et la traduction
+      langage: texte
+      contenu: |
+        Boutique  LAN local           Vu par le siège (dans le tunnel)
+        B01       192.168.1.0/25  →   192.168.50.0/25
+        B02       192.168.1.0/25  →   192.168.51.0/25
+    - type: etapes
+      etapes:
+        - label: Côté siège
+          texte: BINAT déclaré directement dans les entrées de phase 2 du pfSense, et routes statiques vers chaque réseau virtuel `192.168.5x.0`.
+        - label: Côté boutique
+          texte: Règles de NAT 1:1 dédiées sur l'interface IPsec de chaque OPNsense.
+        - label: Effet
+          texte: Chaque boutique garde exactement la même configuration locale, et les flux traduits restent lisibles dans les logs du pare-feu.
+    - type: recette
+      titre: Recette
+      lignes:
+        - test: Vérification des alias .50.0 et .51.0.
+          statut: conforme
+          obs: Masquage des doublons IP boutique.
+  capture: Capture des entrées de phase 2 (BINAT) sur le pfSense du siège
+  montre: Le cahier des charges imposait la même IP partout. J'ai gardé la contrainte et réglé le problème dans le tunnel. La visibilité de la boutique 2 reste non conforme sur deux tests (pièce 02).
+  source: Note de synthèse SAÉ 3.03, §2.1 et §2.2, et cahier de tests, tableau 2
+
+- id: dmz
+  phrase: Un serveur compromis en DMZ reste confiné.
+  blocs:
+    - type: liste
+      titre: Ce qui isole la DMZ
+      items:
+        - "DMZ `10.11.1.0/24` séparée physiquement et logiquement du LAN du siège `10.10.1.0/24` : un proxy compromis ne donne aucun accès direct aux données RH ou compta."
+        - "MariaDB, qui stocke les jetons OTP, n'écoute que sur `127.0.0.1:3306` : aucune attaque réseau possible sur la base."
+        - "SSH d'administration sur le port TCP 10022, `PasswordAuthentication no`, connexion par clé uniquement."
+        - "Squid bloque le téléchargement des exécutables (.exe, .bat, .sh), validé avec le fichier de test EICAR."
+    - type: etapes
+      titre: Test « malware » qui tente de sortir sans le proxy
+      etapes:
+        - label: Test
+          texte: Connexion directe (Telnet) sur le port 80 vers 8.8.8.8.
+        - label: Résultat
+          texte: "`Connection Timed Out` : le pare-feu bloque tout trafic web qui ne vient pas du proxy."
+        - label: DNS
+          texte: "`Server Lookup Failure` : sans le proxy, le client ne résout aucun nom."
+  montre: Nous n'avons pas seulement fermé des ports. Nous avons simulé ce que ferait un poste infecté, et vérifié qu'il ne sortait pas.
+  source: Note de synthèse SAÉ 3.03, §2.5 et §2.6
+
+- id: load-balancer
+  phrase: Notre infrastructure web peut grossir sans être réécrite.
+  blocs:
+    - type: code
+      titre: Déclaration d'un nouveau backend dans le load balancer Apache
+      langage: apache
+      contenu: |
+        <Proxy "balancer://mycluster">
+            BalancerMember http://10.2.20.20:80 # WEB-01 (existant)
+            BalancerMember http://10.2.20.21:80 # WEB-02 (nouveau)
+            BalancerMember http://127.0.0.1:8080 status=+H # Maintenance
+            ProxySet lbmethod=byrequests
+        </Proxy>
+    - type: liste
+      titre: Ce qu'il faut adapter autour
+      items:
+        - "`byrequests` répartit les requêtes à tour de rôle. Le backend de maintenance (`status=+H`) ne reçoit du trafic que si tous les autres tombent."
+        - Règles de pare-feu à ouvrir depuis la DMZ RP vers le nouveau serveur (80/TCP) et pour l'agent Wazuh (1514).
+        - Sessions WordPress stockées en base, base MariaDB centralisée, médias `wp-content/uploads` sur un partage NFS.
+  montre: Ajouter un serveur ne se résume pas à une ligne de config. Il faut aussi penser aux sessions, aux fichiers partagés et au filtrage.
+  source: Note de synthèse d'architecture SAÉ 4.01, §3.2
+
+- id: wazuh-fim
+  phrase: Si quelqu'un modifie la config d'un serveur, je le sais.
+  blocs:
+    - type: code
+      titre: Chemins surveillés par le FIM de Wazuh
+      langage: texte
+      contenu: |
+        /etc/apache2/sites-enabled
+        /etc/nginx/sites-enabled
+        + les certificats serveurs
+    - type: liste
+      titre: Ce que j'ai mis en place
+      items:
+        - Agents Wazuh sur tous les serveurs compatibles (Linux et Windows), qui remontent vers le manager en DMZ Logs.
+        - "Logs collectés : système, pare-feu/IPS, reverse proxy Apache, ModSecurity, nginx, fail2ban, SFTP, PAM, AD."
+        - Alertes automatiques en cas de modification suspecte, de création ou de suppression de fichiers dans ces chemins.
+        - "Piste d'amélioration notée : des alertes par email pour les incidents critiques, en plus du rapport quotidien."
+  capture: Capture d'une alerte FIM Wazuh après modification d'un fichier de configuration
+  montre: Un attaquant qui touche à la config du reverse proxy ou remplace un certificat laisse une trace, et une alerte part.
+  source: Note de synthèse d'architecture SAÉ 4.01, §2.2.5 et §4.3

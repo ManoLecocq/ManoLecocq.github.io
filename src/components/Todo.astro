@@ -1,0 +1,7 @@
+---
+// Laisse un commentaire HTML « TODO Mano » dans la page générée.
+interface Props { texte?: string }
+const { texte } = Astro.props;
+const propre = texte ? String(texte).replace(/--/g, '—') : '';
+---
+{propre && <Fragment set:html={`<!-- TODO Mano : ${propre} -->`} />}

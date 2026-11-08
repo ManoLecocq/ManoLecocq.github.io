@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.astro/
+# Les PDF sources (notes de synthèse, profil) ne sont pas publiés
+sources/

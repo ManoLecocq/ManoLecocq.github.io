@@ -1,0 +1,63 @@
+/* Jetons de design.
+   Toutes les couleurs passent par ces variables : un thème sombre pourra
+   plus tard redéfinir ce bloc sous :root[data-theme="dark"] sans toucher aux composants. */
+:root {
+  /* Papier et encre */
+  --paper: #f6f2e9;
+  --paper-raised: #fbf8f2;      /* cartes, tiroirs */
+  --paper-sunk: #efe9dc;        /* blocs de code, cartouches */
+  --ink: #1c2a3a;               /* texte et traits principaux · 13:1 sur papier */
+  --ink-soft: #4a5868;          /* texte secondaire · 6.5:1 */
+  --ink-faint: #5a6676;         /* labels mono · 5.2:1 */
+  --line: rgb(28 42 58 / 0.22); /* traits fins */
+  --line-strong: rgb(28 42 58 / 0.6);
+  --grid-minor: rgb(28 42 58 / 0.045);
+  --grid-major: rgb(28 42 58 / 0.08);
+
+  /* Accent unique : orange signal, réservé aux éléments actifs */
+  --accent: #e8590c;            /* traits, soulignés, focus (3.2:1, non-texte) */
+  --accent-ink: #b23f06;        /* texte en accent · 5.2:1 */
+  --accent-wash: rgb(232 89 12 / 0.09);
+  --on-accent: #ffffff;
+
+  /* Statuts de recette (toujours accompagnés du libellé écrit) */
+  --ok: #2f6b3a;
+  --ko: #a3341f;
+
+  /* Typographie */
+  --f-title: 'Archivo Variable', 'Archivo', 'Helvetica Neue', sans-serif;
+  --f-text: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --fs-mono: 0.78rem;
+  --fs-small: 0.92rem;
+  --fs-body: 1.0625rem;
+  --fs-lead: clamp(1.125rem, 1rem + 0.5vw, 1.3rem);
+  --fs-h3: clamp(1.2rem, 1.05rem + 0.6vw, 1.45rem);
+  --fs-h2: clamp(1.6rem, 1.2rem + 1.8vw, 2.5rem);
+  --fs-display: clamp(2.6rem, 1.6rem + 5vw, 5.4rem);
+  --fs-problem: clamp(1.45rem, 1.05rem + 2vw, 2.55rem);
+
+  /* Espacements et mise en page */
+  --gutter: 16px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 5rem;
+  --measure: 66ch;
+  --page-max: 72rem;
+  --radius: 2px;
+  --stroke: 1px;
+  --tap: 44px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 450ms;
+}
+
+@media (min-width: 720px) {
+  :root { --gutter: 32px; }
+}

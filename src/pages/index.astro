@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import Hero from '../components/Hero.astro';
+import Constat from '../components/Constat.astro';
+import Preuves from '../components/Preuves.astro';
+import Projets from '../components/Projets.astro';
+import Competences from '../components/Competences.astro';
+import Certifications from '../components/Certifications.astro';
+import Parcours from '../components/Parcours.astro';
+import Reponse from '../components/Reponse.astro';
+import Contact from '../components/Contact.astro';
+import Verification from '../components/Verification.astro';
+import { load } from '../lib/data.js';
+
+const site = load('site');
+const projets = load('projets');
+const certifications = load('certifications');
+const reponse = load('reponse');
+const pl = Object.fromEntries(site.planches.map((p) => [p.ancre, p]));
+---
+<BaseLayout titre={site.meta.titre} description={site.meta.description}>
+  <SiteHeader slot="header" nom={site.nom} planches={site.planches} />
+  <Hero site={site} />
+  <Constat data={load('constat')} planche={pl.constat} />
+  <Preuves data={load('preuves')} planche={pl.preuves} projets={projets.fiches} />
+  <Projets data={projets} planche={pl.projets} />
+  <Competences data={load('competences')} planche={pl.competences} />
+  <Certifications data={certifications} planche={pl.certifications} />
+  <Parcours data={load('parcours')} planche={pl.parcours} />
+  <Reponse data={reponse} planche={pl.reponse} certifications={certifications} />
+  <Contact site={site} planche={pl.contact} />
+
+  <footer class="site-footer" slot="footer">
+    <div class="wrap site-footer__inner mono">
+      <span>{site.nom} · Plan n° 00 · Rév. A</span>
+      <span>Preuves tirées des notes de synthèse et du cahier de tests des SAÉ</span>
+      <a href="#top">Haut de page <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+
+  <Verification slot="after" messageFin={reponse.message_fin} />
+</BaseLayout>
+
+<style>
+  .site-footer { border-top: 1.5px solid var(--ink); padding-block: var(--space-5); }
+  .site-footer__inner { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); justify-content: space-between; align-items: center; text-transform: none; }
+  .site-footer a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  :global(body.has-verif) .site-footer { padding-bottom: calc(var(--space-5) + 4rem); }
+</style>

@@ -1,0 +1,51 @@
+---
+import Planche from './Planche.astro';
+import Affirmation from './Affirmation.astro';
+import { inline } from '../lib/text.js';
+const { data, planche, projets } = Astro.props;
+const titreProjet = (id) => projets.find((p) => p.id === id);
+---
+<Planche num={planche.num} titre={planche.titre} id={planche.ancre} sousTitre={data.sous_titre}>
+  <ol class="types" role="list">
+    {data.types.map((t) => (
+      <li class="type" id={`preuve-${t.code.toLowerCase()}`}>
+        <header class="type__head" data-reveal>
+          <span class="type__code" aria-hidden="true">{t.code}</span>
+          <div>
+            <h3>{t.titre}</h3>
+            <p set:html={inline(t.texte)} />
+            <p class="type__projets mono">
+              Voir :{' '}
+              {t.projets.map((id, i) => {
+                const p = titreProjet(id);
+                return <>{i > 0 && ' · '}<a href={`#fiche-${id}`}>{p.etiquette.split(' · ')[0]} · {p.titre}</a></>;
+              })}
+            </p>
+          </div>
+        </header>
+        <div class="type__claims">
+          {t.affirmations.map((id) => <Affirmation id={id} />)}
+        </div>
+      </li>
+    ))}
+  </ol>
+</Planche>
+
+<style>
+  .types { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-7); }
+  .type__head { display: grid; grid-template-columns: auto 1fr; gap: var(--space-4); align-items: start; }
+  .type__code {
+    display: grid; place-items: center;
+    width: 2.75rem; height: 2.75rem;
+    border: 1.5px solid var(--ink);
+    font-family: var(--f-title); font-weight: 800; font-stretch: 125%; font-size: 1.25rem;
+    background: var(--paper-raised);
+  }
+  .type__head h3 { font-size: var(--fs-h3); margin-bottom: var(--space-2); padding-top: 0.45rem; }
+  .type__projets { text-transform: none; letter-spacing: 0.01em; margin: 0; }
+  .type__projets a { display: inline-block; padding-block: 0.6rem; }
+  .type__claims { margin-left: 0; }
+  @media (min-width: 720px) {
+    .type__claims { margin-left: calc(2.75rem + var(--space-4)); }
+  }
+</style>
